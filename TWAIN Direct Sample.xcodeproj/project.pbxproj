@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		843963961F797D6700115128 /* ScannerPickerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843963951F797D6700115128 /* ScannerPickerTableViewController.swift */; };
 		843963991F798B1300115128 /* TaskPickerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843963981F798B1300115128 /* TaskPickerTableViewController.swift */; };
+		8474E2381F7AD31200B497A2 /* ImageBlockQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */; };
 		84A1C6C51F74420F0062C442 /* AES256CBC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A1C6C31F7441CF0062C442 /* AES256CBC.swift */; };
 		84A1C6C61F74420F0062C442 /* Base64.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A1C6C01F7441CF0062C442 /* Base64.swift */; };
 		84A1C6C71F74420F0062C442 /* BaseDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A1C6BF1F7441CF0062C442 /* BaseDestination.swift */; };
@@ -31,6 +32,7 @@
 		843963951F797D6700115128 /* ScannerPickerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerPickerTableViewController.swift; sourceTree = "<group>"; };
 		843963971F79835300115128 /* TWAIN Direct Sample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TWAIN Direct Sample.entitlements"; sourceTree = "<group>"; };
 		843963981F798B1300115128 /* TaskPickerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPickerTableViewController.swift; sourceTree = "<group>"; };
+		8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBlockQueue.swift; sourceTree = "<group>"; };
 		84A1C6BE1F7441CF0062C442 /* SwiftyBeaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftyBeaver.swift; sourceTree = "<group>"; };
 		84A1C6BF1F7441CF0062C442 /* BaseDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseDestination.swift; sourceTree = "<group>"; };
 		84A1C6C01F7441CF0062C442 /* Base64.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base64.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				84B595A71F7437C4009DD9A4 /* ServiceDiscoverer.swift */,
 				84A1C6CC1F744E2F0062C442 /* ScannerInfo.swift */,
 				84C96AA41F758F7200F2038D /* Session.swift */,
+				8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */,
 			);
 			path = "TWAIN Direct";
 			sourceTree = "<group>";
@@ -217,6 +220,7 @@
 				84A1C6CB1F74420F0062C442 /* SwiftyBeaver.swift in Sources */,
 				84A1C6CD1F744E2F0062C442 /* ScannerInfo.swift in Sources */,
 				84A1C6C51F74420F0062C442 /* AES256CBC.swift in Sources */,
+				8474E2381F7AD31200B497A2 /* ImageBlockQueue.swift in Sources */,
 				84B595971F743715009DD9A4 /* ViewController.swift in Sources */,
 				84A1C6C91F74420F0062C442 /* FileDestination.swift in Sources */,
 				843963991F798B1300115128 /* TaskPickerTableViewController.swift in Sources */,

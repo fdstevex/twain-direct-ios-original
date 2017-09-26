@@ -92,6 +92,21 @@ struct SendTaskRequest : Encodable {
     }
 }
 
+struct WaitForEventsRequest : Encodable {
+    var kind = "twainlocalscanner"
+    var commandId = UUID().uuidString
+    var method = "waitForEvents"
+    var params: WaitForEventsParams
+    
+    init(sessionId: String, sessionRevision: Int) {
+        params = WaitForEventsParams(sessionId: sessionId, sessionRevision: sessionRevision)
+    }
+    
+    struct WaitForEventsParams : Encodable {
+        var sessionId: String
+        var sessionRevision: Int
+    }
+}
 
 struct CreateSessionRequest : Codable {
     var kind = "twainlocalscanner"
@@ -138,6 +153,28 @@ struct SendTaskResponse : Codable {
     var results: CommandResult
 }
 
+struct WaitForEventsResponse : Codable {
+    var commandId: String
+    var kind: String
+    var method: String
+    var results: WaitForEventsResults
+    
+    struct WaitForEventsResults : Codable {
+        var success: Bool
+        var events: [SessionEvent]
+    }
+    
+    struct SessionEvent : Codable {
+        var doneCapturing: Bool
+        var imageBlocks: [Int]
+        var imageBlocksDrained: Bool
+        var revision: Int
+        var sessionId: String
+        var state: String
+        var status: SessionStatus
+    }
+}
+
 class Session {
     enum BlockStatus: String, Codable {
         // Ready to download
@@ -171,8 +208,12 @@ class Session {
     }
     
     private var sessionID: String?
-    private var sessionRevision: Int?
+    private var sessionRevision = 0
     private var infoExResponse: InfoExResponse?
+
+    private var longPollSession: URLSession?
+
+    let lock = NSLock()
     
     var scanner: ScannerInfo
     weak var delegate: SessionDelegate?
@@ -228,6 +269,7 @@ class Session {
         return request
     }
     
+    // Create the session. If successful, starts the event listener.
     func createSession(completion: @escaping (AsyncResult)->()) {
         guard var request = createURLRequest(method: "POST") else {
             // This shouldn't fail, but just in case
@@ -252,11 +294,15 @@ class Session {
                     return
                 }
                 self.sessionID = createSessionResponse.results.session?.sessionId
+                self.sessionRevision = 0
                 if (self.sessionID == nil) {
+                    // Expected the result to have a session since success was true
                     let error = SessionError.missingSessionID
                     completion(AsyncResult.Failure(error))
                     return
                 }
+                
+                self.waitForEvents();
                 completion(AsyncResult.Success)
             } catch {
                 completion(AsyncResult.Failure(error))
@@ -265,6 +311,85 @@ class Session {
         task.resume()
     }
     
+    func resetWaitForEvents() {
+        
+    }
+    
+    // Start a waitForEvents call. There must be an active session. Will do nothing if
+    // there's already a longPollSession.
+    private func waitForEvents() {
+        lock.lock()
+        defer {
+            lock.unlock()
+        }
+        
+        if (self.longPollSession == nil) {
+            guard var urlRequest = createURLRequest(method: "POST") else {
+                log.error("Unexpected: Can't poll because createURLRequest failed")
+                return
+            }
+
+            guard let sessionID = sessionID else {
+                log.error("Unexpected: waitForEvents, but there's no session")
+                return
+            }
+
+                let body = WaitForEventsRequest(sessionId: sessionID, sessionRevision: sessionRevision)
+                urlRequest.httpBody = try? JSONEncoder().encode(body)
+            
+            let task = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
+                
+                self.lock.lock();
+                defer {
+                    self.lock.unlock();
+                }
+                
+                do {
+                    guard let data = data else {
+                        // No response data .. queue up another wait
+                        self.resetWaitForEvents()
+                        return
+                    }
+                    
+                    let response = try JSONDecoder().decode(WaitForEventsResponse.self, from: data)
+                    if (!response.results.success) {
+                        log.error("waitForEvents reported failure")
+                        return
+                    }
+                    
+                    response.results.events.forEach { event in
+                        if (event.revision < self.sessionRevision) {
+                            // We've already processed this event
+                            return
+                        }
+
+                        //                    if (session.has("imageBlocks")) {
+                        //                        synchronized(this) {
+                        //                            JSONArray ibready = session.getJSONArray("imageBlocks");
+                        //                            if (ibready != null) {
+                        //                                for (int ibidx = 0; ibidx < ibready.length(); ibidx++) {
+                        //                                    int blockNum = ibready.getInt(ibidx);
+                        //                                    if (Session.this.blockStatus.get(blockNum) == null) {
+                        //                                        Session.this.blockStatus.put(blockNum, BlockStatus.readyToDownload);
+                        //                                    }
+                        //                                }
+                        //                            }
+                        //                        }
+                        //
+                        //                        getNextImageBlock();
+                        
+                    }
+                    
+                } catch {
+                    log.error("TODO why")
+                    return
+                }
+                
+            }
+            
+            task.resume()
+        }
+    }
     
     func closeSession(completion: @escaping (AsyncResult)->()) {
         guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
@@ -294,6 +419,16 @@ class Session {
         }
         task.resume()
     }
+    
+    // sendTask takes a little more fiddling than usual because while we use Swift 4's
+    // JSON Codable support for requests and responses elsewhere, in this case we need to
+    // insert arbitrary JSON (the task), and there's no support for that.
+    //
+    // Instead, we prepare the request without the task JSON, use JSONEncoder to encode
+    // that into JSON, and then decode that into a dictionary with JSONSerialization.
+    // Then we can update that dictionary to include the task, and re-encode to JSON.
+    //
+    // Are there easier ways? Yes. Yes, there are.
     
     func sendTask(_ task: [String:Any], completion: @escaping (AsyncResult)->()) {
         guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
