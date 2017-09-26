@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/Discovery/ServiceDiscoverer.swift"
+            timestampString = "527715258.696954"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "26"
+            endingLineNumber = "26"
+            landmarkName = "start()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/Discovery/ServiceDiscoverer.swift"
+            timestampString = "527715258.697422"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "54"
+            endingLineNumber = "54"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/Discovery/ServiceDiscoverer.swift"
+            timestampString = "527715258.697807"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
+            landmarkName = "netService(_:didNotResolve:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529239"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529376"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TWAIN_Direct_Sample.ServiceDiscoverer.netServiceDidResolveAddress(__ObjC.NetService) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/TWAIN%20Direct/ServiceDiscoverer.swift"
+                  timestampString = "527783438.255696"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "71"
+                  endingLineNumber = "71"
+                  offsetFromSymbolStart = "1399">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Foundation.Data) -&gt; Swift.String in TWAIN_Direct_Sample.ServiceDiscoverer.netServiceDidResolveAddress(__ObjC.NetService) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/TWAIN%20Direct/ServiceDiscoverer.swift"
+                  timestampString = "527783438.259741"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "72"
+                  endingLineNumber = "72"
+                  offsetFromSymbolStart = "23">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529486"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529621"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "56"
+            endingLineNumber = "56"
+            landmarkName = "netServiceBrowserDidStopSearch(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TWAIN_Direct_Sample.ServiceDiscoverer.netServiceBrowserDidStopSearch(__ObjC.NetServiceBrowser) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/TWAIN%20Direct/ServiceDiscoverer.swift"
+                  timestampString = "528058089.989112"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "50"
+                  endingLineNumber = "50"
+                  offsetFromSymbolStart = "21">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "implicit closure #1 : @autoclosure () -&gt; Any in TWAIN_Direct_Sample.ServiceDiscoverer.netServiceBrowserDidStopSearch(__ObjC.NetServiceBrowser) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/TWAIN%20Direct/ServiceDiscoverer.swift"
+                  timestampString = "528058089.993331"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "50"
+                  endingLineNumber = "50"
+                  offsetFromSymbolStart = "4">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/UI/ScannerPickerTableViewController.swift"
+            timestampString = "528059189.832802"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "49"
+            endingLineNumber = "49"
+            landmarkName = "discoverer(_:didDiscover:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TWAIN_Direct_Sample.ScannerPickerTableViewController.discoverer(TWAIN_Direct_Sample.ServiceDiscoverer, didDiscover: Swift.Array&lt;TWAIN_Direct_Sample.ScannerInfo&gt;) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/ScannerPickerTableViewController.swift"
+                  timestampString = "528064732.25523"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "49"
+                  endingLineNumber = "49"
+                  offsetFromSymbolStart = "25">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "implicit closure #1 : @autoclosure () -&gt; Any in TWAIN_Direct_Sample.ScannerPickerTableViewController.discoverer(TWAIN_Direct_Sample.ServiceDiscoverer, didDiscover: Swift.Array&lt;TWAIN_Direct_Sample.ScannerInfo&gt;) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/ScannerPickerTableViewController.swift"
+                  timestampString = "528064732.259691"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "49"
+                  endingLineNumber = "49"
+                  offsetFromSymbolStart = "4">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/UI/ScannerPickerTableViewController.swift"
+            timestampString = "528059189.832866"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "18"
+            endingLineNumber = "18"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529796"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "34"
+            endingLineNumber = "34"
+            landmarkName = "start()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529893"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "47"
+            endingLineNumber = "47"
+            landmarkName = "netServiceBrowser(_:didFind:moreComing:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.529975"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.530041"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/ServiceDiscoverer.swift"
+            timestampString = "528061555.530105"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "104"
+            endingLineNumber = "104"
+            landmarkName = "netServiceDidResolveAddress(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/UI/MainTableTableViewController.swift"
+            timestampString = "528064732.115511"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "30"
+            endingLineNumber = "30"
+            landmarkName = "didTapStart(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/UI/MainTableTableViewController.swift"
+            timestampString = "528064732.115601"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "35"
+            endingLineNumber = "35"
+            landmarkName = "didTapStart(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TWAIN_Direct_Sample.MainTableTableViewController.didTapStart(Any) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/MainTableTableViewController.swift"
+                  timestampString = "528064550.434533"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "35"
+                  endingLineNumber = "35"
+                  offsetFromSymbolStart = "537">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (TWAIN_Direct_Sample.AsyncResult) -&gt; () in TWAIN_Direct_Sample.MainTableTableViewController.didTapStart(Any) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/MainTableTableViewController.swift"
+                  timestampString = "528064550.439492"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36"
+                  offsetFromSymbolStart = "17">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/Session.swift"
+            timestampString = "528064732.115673"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "118"
+            endingLineNumber = "118"
+            landmarkName = "open(completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Foundation.Data&gt;, Swift.Optional&lt;__ObjC.URLResponse&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in TWAIN_Direct_Sample.Session.open() -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/TWAIN%20Direct/Session.swift"
+                  timestampString = "528061555.68058"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "74"
+                  endingLineNumber = "74"
+                  offsetFromSymbolStart = "33">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "implicit closure #1 : @autoclosure () -&gt; Any in closure #1 (Swift.Optional&lt;Foundation.Data&gt;, Swift.Optional&lt;__ObjC.URLResponse&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in TWAIN_Direct_Sample.Session.open() -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/TWAIN%20Direct/Session.swift"
+                  timestampString = "528061555.685018"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "74"
+                  endingLineNumber = "74"
+                  offsetFromSymbolStart = "4">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/Session.swift"
+            timestampString = "528064732.116102"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
+            landmarkName = "open(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/Session.swift"
+            timestampString = "528064732.116422"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
+            landmarkName = "open(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/UI/MainTableTableViewController.swift"
+            timestampString = "528064732.116786"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "didTapStart(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (TWAIN_Direct_Sample.AsyncResult) -&gt; () in TWAIN_Direct_Sample.MainTableTableViewController.didTapStart(Any) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/MainTableTableViewController.swift"
+                  timestampString = "528064732.275197"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "38"
+                  endingLineNumber = "38"
+                  offsetFromSymbolStart = "49">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "implicit closure #1 : @autoclosure () -&gt; Any in closure #1 (TWAIN_Direct_Sample.AsyncResult) -&gt; () in TWAIN_Direct_Sample.MainTableTableViewController.didTapStart(Any) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/MainTableTableViewController.swift"
+                  timestampString = "528064732.278997"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "38"
+                  endingLineNumber = "38"
+                  offsetFromSymbolStart = "4">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/UI/MainTableTableViewController.swift"
+            timestampString = "528064732.116859"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "didTapStart(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (TWAIN_Direct_Sample.AsyncResult) -&gt; () in TWAIN_Direct_Sample.MainTableTableViewController.didTapStart(Any) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/MainTableTableViewController.swift"
+                  timestampString = "528064732.289105"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "40"
+                  endingLineNumber = "40"
+                  offsetFromSymbolStart = "337">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "implicit closure #2 : @autoclosure () -&gt; Any in closure #1 (TWAIN_Direct_Sample.AsyncResult) -&gt; () in TWAIN_Direct_Sample.MainTableTableViewController.didTapStart(Any) -&gt; ()"
+                  moduleName = "TWAIN Direct Sample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/stevex/src/twain/src/cocoa/TWAIN%20Direct%20Sample/TWAIN%20Direct%20Sample/UI/MainTableTableViewController.swift"
+                  timestampString = "528064732.293486"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "40"
+                  endingLineNumber = "40"
+                  offsetFromSymbolStart = "15">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TWAIN Direct Sample/TWAIN Direct/Session.swift"
+            timestampString = "528064732.116926"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
+            landmarkName = "open(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
