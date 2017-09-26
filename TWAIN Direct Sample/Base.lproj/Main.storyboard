@@ -88,7 +88,7 @@
                                                             <rect key="frame" x="113" y="0.0" width="139.5" height="63.5"/>
                                                             <state key="normal" title="Pause"/>
                                                             <connections>
-                                                                <action selector="ddTapPause:" destination="JEU-Lg-cln" eventType="touchUpInside" id="qv2-2Z-aPy"/>
+                                                                <action selector="didTapPause:" destination="JEU-Lg-cln" eventType="touchUpInside" id="AYI-qe-Gaa"/>
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GDh-DC-l2g">

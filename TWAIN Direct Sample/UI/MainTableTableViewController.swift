@@ -32,18 +32,47 @@ class MainTableTableViewController: UITableViewController {
         }
         let scanner = ScannerInfo(url: url, fqdn: "DESKTOP-48KEF92.local", txtDict: [String:String]())
         session = Session(scanner: scanner)
-        session?.open(completion: { result in
+        session?.open { result in
             switch (result) {
             case .Success:
                 log.info("Success")
+                self.sendTask()
             case .Failure(let error):
                 log.info("Failure: \(String(describing:error))")
             }
-        })
+        }
     }
     
-    @IBAction func ddTapPause(_ sender: Any) {
+    func sendTask() {
+        let data = "{\"actions\": [ { \"action\": \"configure\" } ] }".data(using: .utf8)
+        let taskObj = try? JSONSerialization.jsonObject(with: data!, options: []) as! [String:Any]
         
+        session?.sendTask(taskObj!) { result in
+            switch (result) {
+            case .Success:
+                log.info("sendTask completed successfully")
+                break;
+            case .Failure(let error):
+                log.info("sendTask Failure: \(String(describing:error))")
+                break;
+            }
+        }
+    }
+    
+    // temporary test method
+    func closeSession() {
+        session?.closeSession(completion: { (result) in
+            switch (result) {
+            case .Success:
+                log.info("Session closed")
+            case .Failure(let error):
+                log.error("Close failed, error=\(String(describing:error))")
+            }
+        })
+    }
+
+    @IBAction func didTapPause(_ sender: Any) {
+        closeSession()
     }
     
     @IBAction func didTapStop(_ sender: Any) {
