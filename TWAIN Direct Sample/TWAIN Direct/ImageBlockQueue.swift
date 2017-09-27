@@ -20,22 +20,3 @@ struct ImageBlockInfo {
     
 }
 
-class ImageBlockQueue {
-    
-    enum BlockStatus {
-        // Ready to download
-        case readyToDownload
-        // Currently downloading
-        case downloading
-        // Downloaded, but waiting for more parts
-        case waitingForMoreParts
-        // Delivered to the client application, and deleted
-        case completed
-    }
-    
-    // Status of all the blocks we're aware of
-    var blockStatus = [Int: BlockStatus]()
-
-    // Map of block number to ImageBlockInfo for images we've downloaded
-    var files = [Int:ImageBlockInfo]()
-}

@@ -24,6 +24,7 @@
 		84B5959C1F743715009DD9A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84B5959B1F743715009DD9A4 /* Assets.xcassets */; };
 		84B5959F1F743715009DD9A4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84B5959D1F743715009DD9A4 /* LaunchScreen.storyboard */; };
 		84B595A81F7437C4009DD9A4 /* ServiceDiscoverer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B595A71F7437C4009DD9A4 /* ServiceDiscoverer.swift */; };
+		84B6A6A31F7C24B90024F4A5 /* BlockDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B6A6A21F7C24B90024F4A5 /* BlockDownloader.swift */; };
 		84C96AA31F75818600F2038D /* MainTableTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96AA21F75818600F2038D /* MainTableTableViewController.swift */; };
 		84C96AA51F758F7200F2038D /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C96AA41F758F7200F2038D /* Session.swift */; };
 /* End PBXBuildFile section */
@@ -49,6 +50,7 @@
 		84B5959E1F743715009DD9A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		84B595A01F743715009DD9A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84B595A71F7437C4009DD9A4 /* ServiceDiscoverer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDiscoverer.swift; sourceTree = "<group>"; };
+		84B6A6A21F7C24B90024F4A5 /* BlockDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockDownloader.swift; sourceTree = "<group>"; };
 		84C96AA21F75818600F2038D /* MainTableTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableTableViewController.swift; sourceTree = "<group>"; };
 		84C96AA41F758F7200F2038D /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -126,6 +128,7 @@
 				84A1C6CC1F744E2F0062C442 /* ScannerInfo.swift */,
 				84C96AA41F758F7200F2038D /* Session.swift */,
 				8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */,
+				84B6A6A21F7C24B90024F4A5 /* BlockDownloader.swift */,
 			);
 			path = "TWAIN Direct";
 			sourceTree = "<group>";
@@ -232,6 +235,7 @@
 				84A1C6C61F74420F0062C442 /* Base64.swift in Sources */,
 				84B595951F743715009DD9A4 /* AppDelegate.swift in Sources */,
 				84A1C6CA1F74420F0062C442 /* Filter.swift in Sources */,
+				84B6A6A31F7C24B90024F4A5 /* BlockDownloader.swift in Sources */,
 				84A1C6C71F74420F0062C442 /* BaseDestination.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
