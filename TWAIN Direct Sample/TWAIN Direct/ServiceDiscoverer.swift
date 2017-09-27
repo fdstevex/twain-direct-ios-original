@@ -14,7 +14,9 @@ protocol ServiceDiscovererDelegate: class {
 }
 
 class ServiceDiscoverer : NSObject {
-    var discoveredScanners = [URL:ScannerInfo]()
+    // Map if discovered scanners - the key is the URL of the host plus the
+    // friendly name of the scanner.
+    var discoveredScanners = [String:ScannerInfo]()
 
     weak var delegate: ServiceDiscovererDelegate?
     
@@ -37,6 +39,46 @@ class ServiceDiscoverer : NSObject {
     func stop() {
         browser.stop()
     }
+    
+    func scannerInfoFrom(service:NetService) -> ScannerInfo? {
+        guard let data = service.txtRecordData() else {
+            log.error("No TXT record from service \(service.name)")
+            return nil
+        }
+        
+        let dict = NetService.dictionary(fromTXTRecord: data)
+        
+        guard var fqdn = service.hostName else {
+            // We need the host name
+            return nil
+        }
+        
+        // Map the Data values to String values
+        let txtDict = dict.mapValues { (data) -> String in
+            if let str = String(data: data, encoding: .utf8) {
+                return str
+            } else {
+                return ""
+            }
+        }
+        
+        var scheme = "http"
+        if (txtDict["https"] ?? "") == "1" {
+            scheme = "https"
+        }
+        
+        if fqdn.hasSuffix(".") {
+            fqdn = String(fqdn.dropLast())
+        }
+        
+        guard let url = URL(string:"\(scheme)://\(fqdn):\(service.port)/") else {
+            // Error building URL
+            return nil
+        }
+        
+        let scannerInfo = ScannerInfo(url: url, fqdn: fqdn, txtDict: txtDict)
+        return scannerInfo
+    }
 }
 
 extension ServiceDiscoverer : NetServiceBrowserDelegate {
@@ -47,9 +89,12 @@ extension ServiceDiscoverer : NetServiceBrowserDelegate {
         service.resolve(withTimeout: 3.0)
     }
     
-    
     public func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
-        NSLog("didRemoveService")
+        if let scannerInfo = scannerInfoFrom(service:service) {
+            let key = "\(scannerInfo.url.absoluteString)\(String(describing:scannerInfo.friendlyName))"
+            discoveredScanners.removeValue(forKey: key)
+            delegate?.discoverer(self, didDiscover: Array(discoveredScanners.values))
+        }
     }
     
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
@@ -67,45 +112,13 @@ extension ServiceDiscoverer : NetServiceDelegate {
     }
     
     func netServiceDidResolveAddress(_ sender: NetService) {
-        guard let data = sender.txtRecordData() else {
-            log.error("No TXT record from service \(sender.name)")
-            return
+        if let scannerInfo = scannerInfoFrom(service:sender) {
+            let key = "\(scannerInfo.url.absoluteString)\(String(describing:scannerInfo.friendlyName))"
+            
+            log.info("Discovered \(scannerInfo.friendlyName ?? "") at \(scannerInfo.url)")
+            discoveredScanners[key] = scannerInfo
+            delegate?.discoverer(self, didDiscover: Array(discoveredScanners.values))
         }
-
-        let dict = NetService.dictionary(fromTXTRecord: data)
-
-        guard var fqdn = sender.hostName else {
-            // We need the host name
-            return
-        }
-
-        // Map the Data values to String values
-        let txtDict = dict.mapValues { (data) -> String in
-            if let str = String(data: data, encoding: .utf8) {
-                return str
-            } else {
-                return ""
-            }
-        }
-        
-        var scheme = "http"
-        if (txtDict["https"] ?? "") == "1" {
-            scheme = "https"
-        }
-
-        if fqdn.hasSuffix(".") {
-            fqdn = String(fqdn.dropLast())
-        }
-
-        guard let url = URL(string:"\(scheme)://\(fqdn):\(sender.port)/") else {
-            // Error building URL
-            return
-        }
-        
-        let scannerInfo = ScannerInfo(url: url, fqdn: fqdn, txtDict: txtDict)
-        log.info("Discovered \(String(describing:scannerInfo.friendlyName)) at \(url)")
-
-        discoveredScanners[url] = scannerInfo
     }
 }
 
