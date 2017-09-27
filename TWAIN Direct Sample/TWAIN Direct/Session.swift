@@ -20,6 +20,7 @@ enum SessionError : Error {
     case closeSessionFailed(code: String?)
     case missingSessionID
     case invalidJSON
+    case startCapturingFailed(response: StartCapturingResponse)
 }
 
 protocol SessionDelegate: class {
@@ -92,6 +93,12 @@ struct SendTaskRequest : Encodable {
     }
 }
 
+struct SendTaskResponse : Codable {
+    var kind: String
+    var commandId: String
+    var method: String
+    var results: CommandResult
+}
 
 struct CreateSessionRequest : Codable {
     var kind = "twainlocalscanner"
@@ -107,6 +114,11 @@ struct SessionStatus : Codable {
 struct SessionResponse: Codable {
     var sessionId: String
     var revision: Int
+
+    var doneCapturing: Bool?
+    var imageBlocks: [Int]?
+    var imageBlocksDrained: Bool?
+
     var state: Session.State
     var status: SessionStatus
 }
@@ -117,6 +129,30 @@ struct CommandResult: Codable {
     var code: String?
 }
 
+struct StartCapturingRequest : Codable {
+    var kind = "twainlocalscanner"
+    var commandId = UUID().uuidString
+    var method = "startCapturing"
+    
+    var params: StartCapturingParams
+    
+    init(sessionId: String) {
+        params = StartCapturingParams(sessionId: sessionId)
+    }
+    
+    struct StartCapturingParams : Codable {
+        var sessionId: String
+    }
+
+}
+
+struct StartCapturingResponse : Codable {
+    var kind: String
+    var commandId: String
+    var method: String
+    var results: CommandResult
+}
+
 struct CreateSessionResponse : Codable {
     var kind: String
     var commandId: String
@@ -125,13 +161,6 @@ struct CreateSessionResponse : Codable {
 }
 
 struct CloseSessionResponse : Codable {
-    var kind: String
-    var commandId: String
-    var method: String
-    var results: CommandResult
-}
-
-struct SendTaskResponse : Codable {
     var kind: String
     var commandId: String
     var method: String
@@ -257,6 +286,8 @@ class Session {
                     completion(AsyncResult.Failure(error))
                     return
                 }
+                
+                
                 completion(AsyncResult.Success)
             } catch {
                 completion(AsyncResult.Failure(error))
@@ -340,6 +371,35 @@ class Session {
                 completion(AsyncResult.Success)
             } catch {
                 completion(AsyncResult.Failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    func startCapturing(completion: @escaping (AsyncResponse<StartCapturingResponse>)->()) {
+        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
+            // This shouldn't fail, but just in case
+            completion(.Failure(SessionError.unableToCreateRequest))
+            return
+        }
+        
+        request.httpBody = try? JSONEncoder().encode(StartCapturingRequest(sessionId: sessionID))
+
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data else {
+                // No response data
+                completion(.Failure(nil))
+                return
+            }
+            
+            do {
+                let startCapturingResponse = try JSONDecoder().decode(StartCapturingResponse.self, from: data)
+                if (!startCapturingResponse.results.success) {
+                    completion(AsyncResponse.Failure(SessionError.startCapturingFailed(response:startCapturingResponse)))
+                }
+                completion(.Success(startCapturingResponse))
+            } catch {
+                completion(.Failure(error))
             }
         }
         task.resume()

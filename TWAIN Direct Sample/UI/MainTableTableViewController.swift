@@ -43,6 +43,7 @@ class MainTableTableViewController: UITableViewController {
         }
     }
     
+    // Called from didTapStart when the session open succeeds
     func sendTask() {
         let data = "{\"actions\": [ { \"action\": \"configure\" } ] }".data(using: .utf8)
         let taskObj = try? JSONSerialization.jsonObject(with: data!, options: []) as! [String:Any]
@@ -51,6 +52,7 @@ class MainTableTableViewController: UITableViewController {
             switch (result) {
             case .Success:
                 log.info("sendTask completed successfully")
+                self.startCapturing()
                 break;
             case .Failure(let error):
                 log.info("sendTask Failure: \(String(describing:error))")
@@ -58,7 +60,20 @@ class MainTableTableViewController: UITableViewController {
             }
         }
     }
-    
+
+    // Called from sendTask when the task has been successfully sent
+    func startCapturing() {
+        session?.startCapturing(completion: { (response) in
+            switch (response) {
+            case .Success(let result):
+                log.info("startCapture succeeded: \(result)")
+                
+            case .Failure(let error):
+                log.info("startCapture failed; \(String(describing:error))")
+            }
+        })
+    }
+
     // temporary test method
     func closeSession() {
         session?.closeSession(completion: { (result) in
