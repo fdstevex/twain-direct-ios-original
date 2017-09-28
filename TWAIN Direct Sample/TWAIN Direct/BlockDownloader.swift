@@ -167,6 +167,88 @@ class BlockDownloader {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             log.info("Well, we got a block")
             log.info("Now the fun starts")
+            
+            guard let data = data, let response = response else {
+                // TODO error
+                return
+            }
+            
+            guard let urlResponse = response as? HTTPURLResponse else {
+                // TODO error
+                return
+            }
+            
+            if response.mimeType != "multipart/mixed" {
+                // TODO error
+                return
+            }
+            
+            guard let contentTypeHeader = urlResponse.allHeaderFields["Content-Type"] as? String else {
+                // TODO error - no boundary
+                return;
+            }
+            
+            guard let range = contentTypeHeader.range(of: "boundary=") else {
+                // TODO error - no boundary
+                return;
+            }
+
+            let quotedBoundary = String(contentTypeHeader[range.upperBound...])
+            let boundary = "--" + (quotedBoundary as NSString).trimmingCharacters(in: CharacterSet(charactersIn:"\"'"))
+            
+            var callbacks = multipart_parser_settings()
+            let parser = multipart_parser_init(boundary, &callbacks)
+            
+            callbacks.on_header_field = { parser, ptr, count in
+                let data = Data.init(bytes: ptr!, count: count)
+                let str = String(data:data, encoding: .utf8)
+                log.info("fieldName \(str)")
+                return 0
+            }
+            
+            callbacks.on_header_value = { parser, ptr, count in
+                let data = Data.init(bytes: ptr!, count: count)
+                let str = String(data:data, encoding: .utf8)
+                log.info("fieldValue \(str)")
+                return 0
+            }
+            
+            callbacks.on_part_data_begin = { parser in
+                let dataPtr = multipart_parser_get_data(parser)
+                let outData = dataPtr?.assumingMemoryBound(to: Data.self)
+                log.info("part begin");
+                outData?.pointee.removeAll()
+                return 0
+            }
+            
+            callbacks.on_part_data_end = { parser in
+                let dataPtr = multipart_parser_get_data(parser)
+                let outData = dataPtr?.assumingMemoryBound(to: Data.self)
+                log.info("part end, \(outData!.pointee.count) bytes");
+                outData?.pointee.removeAll()
+                return 0
+            }
+
+            var outData = Data()
+            withUnsafeMutablePointer(to: &outData, { (dataPtr) -> Void in
+                multipart_parser_set_data(parser, dataPtr)
+            })
+            
+            callbacks.on_part_data = { parser, ptr, count in
+                let dataPtr = multipart_parser_get_data(parser)
+                let outData = dataPtr?.assumingMemoryBound(to: Data.self)
+                ptr?.withMemoryRebound(to: UInt8.self, capacity: count, { (p) -> Void in
+                    outData?.pointee.append(p, count: count)
+                })
+                return 0
+            }
+
+            let _ = data.withUnsafeBytes {
+                multipart_parser_execute(parser, UnsafePointer($0), data.count)
+            }
+            
+            multipart_parser_free(parser)
+            log.info("Got \(outData.count) bytes")
         }
 
         task.resume()
