@@ -25,7 +25,7 @@ enum SessionError : Error {
 }
 
 protocol SessionDelegate: class {
-    func session(_ session: Session, didReceive file: URL, metadata: [String: Any])
+    func session(_ session: Session, didReceive file: URL, metadata: Data)
     func session(_ session: Session, didChangeState newState:Session.State)
     func session(_ session: Session, didChangeStatus newStatus:Session.StatusDetected, success: Bool)
     func sessionDidFinishCapturing(_ session: Session)

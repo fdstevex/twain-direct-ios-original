@@ -15,6 +15,7 @@ class MainTableTableViewController: UITableViewController {
     @IBOutlet var stopButton: UIButton!
     
     var session: Session?
+    var imageReceiver: ImageReceiver?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +33,10 @@ class MainTableTableViewController: UITableViewController {
         }
         let scanner = ScannerInfo(url: url, fqdn: "DESKTOP-48KEF92.local", txtDict: [String:String]())
         session = Session(scanner: scanner)
+        
+        imageReceiver = ImageReceiver()
+        session?.delegate = imageReceiver
+        
         session?.open { result in
             switch (result) {
             case .Success:

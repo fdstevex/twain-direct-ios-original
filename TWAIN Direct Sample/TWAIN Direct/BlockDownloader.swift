@@ -60,7 +60,7 @@ struct ReadImageBlockResponse : Codable {
     
     struct ImageInfo : Codable {
         var pixelOffsetX: Int
-        var pixelOfsetY: Int
+        var pixelOffsetY: Int
         var pixelFormat: String
         var pixelWidth: Int
         var pixelHeight: Int
@@ -86,6 +86,20 @@ struct ReadImageBlockResponse : Codable {
     }
 }
 
+struct DownloadedBlockInfo {
+    // Block number
+    let blockNum: Int
+    
+    // JSON response as received
+    let metadata: Data
+    
+    // Decoded JSON response
+    let response: ReadImageBlockResponse
+    
+    // Where the PDF was saved
+    let pdfPath: URL
+}
+
 /**
  Managed by a Session, the BlockDownloader keeps track of the blocks that are available,
  and manages downloading, re-assembling and delivering them to the client application.
@@ -95,7 +109,7 @@ class BlockDownloader {
     
     // Block numbers <= this value have been downloaded, assembled, and delivered
     // to the application.
-    var highestBlockCompleted = 0
+    var highestBlockCompleted = 1
 
     // Maximum number of blocks we can be downloading at once
     var windowSize = 3
@@ -103,14 +117,27 @@ class BlockDownloader {
     // Blocks that the scanner has indicated are ready, and our current status.
     var blockStatus = [Int:BlockStatus]()
 
+    // Blocks that we've downloaded but not yet delivered
+    var downloadedBlocks = [Int:DownloadedBlockInfo]()
+    
     // Updated as downloads are queued and complete
     var activeDownloadCount = 0
     
     // The session this downloader is working with
     weak var session: Session?
 
+    var tempFolder: URL
+    
     init(session: Session) {
+        
         self.session = session
+        
+        tempFolder = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("TDScans.xxx")!
+        try? FileManager.default.createDirectory(at: tempFolder, withIntermediateDirectories: true, attributes: nil)
+    }
+    
+    deinit {
+        try? FileManager.default.removeItem(at: tempFolder)
     }
     
     func enqueueBlocks(_ blocks: [Int]) {
@@ -162,23 +189,16 @@ class BlockDownloader {
             return
         }
         
+        log.info("Starting download of block \(blockNum)")
         let body = ReadImageBlockRequest(sessionId: sessionID, imageBlockNum: blockNum)
         request.httpBody = try? JSONEncoder().encode(body)
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            log.info("Well, we got a block")
-            log.info("Now the fun starts")
-            
-            guard let data = data, let response = response else {
+            guard let data = data, let urlResponse = response as? HTTPURLResponse else {
                 // TODO error
                 return
             }
             
-            guard let urlResponse = response as? HTTPURLResponse else {
-                // TODO error
-                return
-            }
-            
-            if response.mimeType != "multipart/mixed" {
+            if urlResponse.mimeType != "multipart/mixed" {
                 // TODO error
                 return
             }
@@ -199,46 +219,86 @@ class BlockDownloader {
             var callbacks = multipart_parser_settings()
             let parser = multipart_parser_init(boundary, &callbacks)
             
+            let tempPDF = self.tempFolder.appendingPathComponent(UUID().uuidString).appendingPathExtension("pdf")
+            
+            class Context {
+                var fieldName: String?
+                var headers = [String:String]()
+                var contentType = ""
+                
+                var json: Data?
+                var pdf: Data?
+                var current = Data()
+                
+                func partDataEnd() {
+                    log.info("part data end, \(current.count) bytes");
+                    
+                    // Figure out where the body part should go
+                    if let contentType = headers["content-type"] {
+                        if contentType.starts(with: "application/json") {
+                            json = current
+                        } else if contentType.starts(with: "application/pdf") {
+                            pdf = current
+                        }
+                    }
+                    
+                    current = Data()
+                }
+            }
+            
+            var context = Context()
+            
             callbacks.on_header_field = { parser, ptr, count in
+                let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self)
                 let data = Data.init(bytes: ptr!, count: count)
-                let str = String(data:data, encoding: .utf8)
-                log.info("fieldName \(str)")
+                context?.pointee.fieldName = String(data:data, encoding: .utf8)
                 return 0
             }
             
             callbacks.on_header_value = { parser, ptr, count in
-                let data = Data.init(bytes: ptr!, count: count)
-                let str = String(data:data, encoding: .utf8)
-                log.info("fieldValue \(str)")
+                if let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self) {
+                    if let fieldName = context.pointee.fieldName {
+                        let data = Data.init(bytes: ptr!, count: count)
+                        if let fieldValue = String(data:data, encoding: .utf8) {
+                            context.pointee.headers[fieldName.lowercased()] = fieldValue
+                            log.info("\(fieldName)=\(fieldValue)")
+                        }
+                    }
+                }
                 return 0
             }
             
             callbacks.on_part_data_begin = { parser in
-                let dataPtr = multipart_parser_get_data(parser)
-                let outData = dataPtr?.assumingMemoryBound(to: Data.self)
+                let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self)
                 log.info("part begin");
-                outData?.pointee.removeAll()
+                context?.pointee.headers.removeAll()
+                return 0
+            }
+            
+            callbacks.on_headers_complete = { parser in
+                if let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self) {
+                    log.info("headers complete")
+                    context.pointee.current = Data()
+                }
+                
                 return 0
             }
             
             callbacks.on_part_data_end = { parser in
-                let dataPtr = multipart_parser_get_data(parser)
-                let outData = dataPtr?.assumingMemoryBound(to: Data.self)
-                log.info("part end, \(outData!.pointee.count) bytes");
-                outData?.pointee.removeAll()
+                if let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self).pointee {
+                    context.partDataEnd()
+                }
                 return 0
             }
 
-            var outData = Data()
-            withUnsafeMutablePointer(to: &outData, { (dataPtr) -> Void in
+            withUnsafeMutablePointer(to: &context, { (dataPtr) -> Void in
                 multipart_parser_set_data(parser, dataPtr)
             })
             
             callbacks.on_part_data = { parser, ptr, count in
-                let dataPtr = multipart_parser_get_data(parser)
-                let outData = dataPtr?.assumingMemoryBound(to: Data.self)
+                let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self)
                 ptr?.withMemoryRebound(to: UInt8.self, capacity: count, { (p) -> Void in
-                    outData?.pointee.append(p, count: count)
+                    context?.pointee.current.append(p, count: count)
                 })
                 return 0
             }
@@ -246,13 +306,53 @@ class BlockDownloader {
             let _ = data.withUnsafeBytes {
                 multipart_parser_execute(parser, UnsafePointer($0), data.count)
             }
-            
+
+            if (context.current.count > 0) {
+                context.partDataEnd()
+            }
             multipart_parser_free(parser)
-            log.info("Got \(outData.count) bytes")
+            
+            // Remove the trailing crlf that ends the body part
+            context.pdf?.removeLast(2)
+            
+            if let pdf = context.pdf, let response = context.json {
+                do {
+                    let result = try JSONDecoder().decode(ReadImageBlockResponse.self, from: response)
+
+                    if (!result.results.success) {
+                        log.error("Failure downloading block: \(result)")
+                        self.lock.lock()
+                        self.blockStatus[blockNum] = .readyToDownload
+                        self.lock.unlock()
+                        return
+                    }
+                    
+                    log.info("Writing PDF for block \(blockNum) to \(tempPDF)")
+                    try? pdf.write(to: tempPDF)
+                    
+                    self.lock.lock()
+                    
+                    // There may not be more parts, but this signals to deliverCompletedBlocks that this
+                    // part is all here.
+                    self.blockStatus[blockNum] = .waitingForMoreParts
+                    
+                    self.downloadedBlocks[blockNum] = DownloadedBlockInfo(blockNum: blockNum, metadata: response, response: result, pdfPath: tempPDF)
+                    
+                    self.lock.unlock()
+                    
+                    self.deliverCompletedBlocks()
+                } catch {
+                    log.error("Error decoding response: \(error)")
+                    self.lock.lock()
+                    self.blockStatus[blockNum] = .readyToDownload
+                    self.lock.unlock()
+                    return
+                }
+            }
         }
 
         task.resume()
-        
+
         // Mark this block as downloading
         blockStatus[blockNum] = .downloading
         activeDownloadCount = activeDownloadCount + 1
@@ -261,8 +361,56 @@ class BlockDownloader {
     // Check for images that we hae all the required parts of to delier
     // a file to the app. Assemble, if required, deliver, and delete the parts.
     func deliverCompletedBlocks() {
+        lock.lock()
         
+        // First part,
+        var partsToAssemble = 0
+        var nextBlock = 0
+        for blockNum in highestBlockCompleted... {
+            guard let downloadedBlockInfo = downloadedBlocks[blockNum] else {
+                // Missing piece, not ready to deliver
+                lock.unlock()
+                return
+            }
+            
+            partsToAssemble = partsToAssemble + 1
+            
+            let metadata = downloadedBlockInfo.response.results.metadata
+            if metadata.address.moreParts != .morePartsPending {
+                // This is the last piece of this PDF, although there may be
+                // more PDFs in the entire image.  We can deliver this.
+                nextBlock = blockNum + 1
+                break
+            }
+        }
+
+        // Use the metadata from the first part to build the filename
+        guard let firstMeta = downloadedBlocks[highestBlockCompleted] else {
+            lock.unlock()
+            return
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmmSS"
+        let address = firstMeta.response.results.metadata.address
+        let fileName = "\(formatter.string(from: Date()))-\(address.sheetNumber)-\(address.imageNumber)-\(address.imagePart).pdf"
+        
+        // Rename the first part
+        let fm = FileManager.default
+        let destURL = tempFolder.appendingPathComponent(fileName)
+        try! fm.moveItem(at:firstMeta.pdfPath, to: destURL)
+        
+        // Concatenate subsequent parts
+        
+        // TODO
+        
+        // Deliver
+        
+        if let session = session {
+            session.delegate?.session(session, didReceive: destURL, metadata: firstMeta.metadata)
+        }
+        
+        highestBlockCompleted = nextBlock
     }
-    
 }
 
