@@ -13,6 +13,8 @@ class MainTableTableViewController: UITableViewController {
     @IBOutlet var startButton: UIButton!
     @IBOutlet var pauseButton: UIButton!
     @IBOutlet var stopButton: UIButton!
+    @IBOutlet weak var selectedScannerLabel: UILabel!
+    @IBOutlet weak var selectedTaskLabel: UILabel!
     
     var session: Session?
     var imageReceiver: ImageReceiver?
@@ -20,11 +22,17 @@ class MainTableTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        updateLabels()
+    }
+    
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
     }
     
     @IBAction func didTapStart(_ sender: Any) {
@@ -97,5 +105,37 @@ class MainTableTableViewController: UITableViewController {
     
     @IBAction func didTapStop(_ sender: Any) {
         
+    }
+
+
+    func updateLabels() {
+        updateScannerInfoLabel()
+        updateTaskLabel()
+    }
+    
+    func updateScannerInfoLabel() {
+        var label = "No scanner selected."
+        defer {
+            selectedScannerLabel.text = label
+        }
+        
+        let scannerJSON = UserDefaults.standard.string(forKey: "scanner")
+        if let scannerInfo = try? JSONDecoder().decode(ScannerInfo.self, from: (scannerJSON?.data(using: .utf8))!) {
+            if let scannerName = scannerInfo.friendlyName {
+                label = scannerName
+            }
+        }
+        
+    }
+    
+    func updateTaskLabel() {
+        var label = "No task selected."
+        defer {
+            selectedTaskLabel.text = label
+        }
+        
+        if let taskName = UserDefaults.standard.string(forKey: "taskName") {
+            label = taskName
+        }
     }
 }

@@ -142,6 +142,8 @@
                     <navigationItem key="navigationItem" title="TWAIN Direct Sample" id="Me7-SB-gfR"/>
                     <connections>
                         <outlet property="pauseButton" destination="iYa-zh-zs3" id="6g5-tu-gCg"/>
+                        <outlet property="selectedScannerLabel" destination="Jxu-FN-BTU" id="Tq1-ON-Xcx"/>
+                        <outlet property="selectedTaskLabel" destination="P47-qc-fvB" id="Q5F-SR-o4Q"/>
                         <outlet property="startButton" destination="Q1c-Na-0QG" id="DsE-4g-uSf"/>
                         <outlet property="stopButton" destination="GDh-DC-l2g" id="s9i-Bk-Zmy"/>
                     </connections>
@@ -182,25 +184,8 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Actions" id="Dhw-3C-bN4">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="v6j-jq-g0o" style="IBUITableViewCellStyleDefault" id="55X-cp-AlK">
-                                        <rect key="frame" x="0.0" y="155.5" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="55X-cp-AlK" id="gRA-rs-w3H">
-                                            <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Select a Task" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="v6j-jq-g0o">
-                                                    <rect key="frame" x="16" y="0.0" width="324" height="43.5"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="GRR-Bm-TJp" style="IBUITableViewCellStyleDefault" id="jSk-ac-X7J">
-                                        <rect key="frame" x="0.0" y="199.5" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="155.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jSk-ac-X7J" id="1cK-SQ-yfj">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -215,6 +200,9 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="mru-Bh-qqZ" kind="show" id="Hcx-6F-DXK"/>
+                                        </connections>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -224,10 +212,47 @@
                             <outlet property="delegate" destination="zq7-jX-5Xz" id="Qyt-A1-Kok"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <outlet property="selectedTaskLabel" destination="lb8-tE-QMT" id="7jS-px-R4h"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="b2u-98-Oz9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1187" y="527"/>
+        </scene>
+        <!--Task Downloader Web View Controller-->
+        <scene sceneID="ip6-3H-qyC">
+            <objects>
+                <viewController id="mru-Bh-qqZ" customClass="TaskDownloaderWebViewController" customModule="TWAIN_Direct_Sample" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="cOs-iv-lrR">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ap0-5w-tzE">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="ap0-5w-tzE" firstAttribute="leading" secondItem="wA8-uE-L1W" secondAttribute="leading" id="BsA-xf-dFd"/>
+                            <constraint firstItem="ap0-5w-tzE" firstAttribute="top" secondItem="cOs-iv-lrR" secondAttribute="top" id="EfA-9x-DbJ"/>
+                            <constraint firstItem="ap0-5w-tzE" firstAttribute="bottom" secondItem="wA8-uE-L1W" secondAttribute="bottom" id="ohW-x0-aS4"/>
+                            <constraint firstItem="ap0-5w-tzE" firstAttribute="trailing" secondItem="wA8-uE-L1W" secondAttribute="trailing" id="r2L-AT-O2y"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="wA8-uE-L1W"/>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="ap0-5w-tzE" id="689-ky-W2k"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YKq-EQ-hzr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2032.8" y="522.18890554722645"/>
         </scene>
         <!--Scanners-->
         <scene sceneID="dih-lv-Szc">

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		843963961F797D6700115128 /* ScannerPickerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843963951F797D6700115128 /* ScannerPickerTableViewController.swift */; };
 		843963991F798B1300115128 /* TaskPickerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843963981F798B1300115128 /* TaskPickerTableViewController.swift */; };
+		8441CB181F8104AA0049D02E /* TaskDownloaderWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8441CB171F8104AA0049D02E /* TaskDownloaderWebViewController.swift */; };
 		846F7D281F801D49004E6EB2 /* ImageReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F7D271F801D49004E6EB2 /* ImageReceiver.swift */; };
 		8474E2381F7AD31200B497A2 /* ImageBlockQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */; };
 		8474E2561F7D653200B497A2 /* multipart_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2541F7D653200B497A2 /* multipart_parser.c */; };
@@ -35,6 +36,7 @@
 		843963951F797D6700115128 /* ScannerPickerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerPickerTableViewController.swift; sourceTree = "<group>"; };
 		843963971F79835300115128 /* TWAIN Direct Sample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TWAIN Direct Sample.entitlements"; sourceTree = "<group>"; };
 		843963981F798B1300115128 /* TaskPickerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPickerTableViewController.swift; sourceTree = "<group>"; };
+		8441CB171F8104AA0049D02E /* TaskDownloaderWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDownloaderWebViewController.swift; sourceTree = "<group>"; };
 		846F7D271F801D49004E6EB2 /* ImageReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageReceiver.swift; sourceTree = "<group>"; };
 		8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBlockQueue.swift; sourceTree = "<group>"; };
 		8474E2531F7D653100B497A2 /* TWAIN Direct Sample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TWAIN Direct Sample-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				843963951F797D6700115128 /* ScannerPickerTableViewController.swift */,
 				843963981F798B1300115128 /* TaskPickerTableViewController.swift */,
 				846F7D271F801D49004E6EB2 /* ImageReceiver.swift */,
+				8441CB171F8104AA0049D02E /* TaskDownloaderWebViewController.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -254,6 +257,7 @@
 				84A1C6C61F74420F0062C442 /* Base64.swift in Sources */,
 				8474E2561F7D653200B497A2 /* multipart_parser.c in Sources */,
 				84B595951F743715009DD9A4 /* AppDelegate.swift in Sources */,
+				8441CB181F8104AA0049D02E /* TaskDownloaderWebViewController.swift in Sources */,
 				846F7D281F801D49004E6EB2 /* ImageReceiver.swift in Sources */,
 				84A1C6CA1F74420F0062C442 /* Filter.swift in Sources */,
 				84B6A6A31F7C24B90024F4A5 /* BlockDownloader.swift in Sources */,
