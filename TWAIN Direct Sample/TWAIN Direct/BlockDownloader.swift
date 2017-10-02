@@ -416,7 +416,6 @@ class BlockDownloader {
         // TODO
         
         // Deliver
-        
         if let session = session {
             session.delegate?.session(session, didReceive: destURL, metadata: firstMeta.metadata)
         }

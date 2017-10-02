@@ -9,10 +9,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--TWAIN Direct Sample-->
+        <!--Main View-->
         <scene sceneID="gqN-xK-oo9">
             <objects>
-                <tableViewController definesPresentationContext="YES" id="JEU-Lg-cln" customClass="MainTableTableViewController" customModule="TWAIN_Direct_Sample" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController definesPresentationContext="YES" id="JEU-Lg-cln" userLabel="Main View" customClass="MainTableTableViewController" customModule="TWAIN_Direct_Sample" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="LGJ-8i-aAM">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -76,36 +76,44 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="wPn-4r-Dci">
-                                                    <rect key="frame" x="8" y="0.0" width="359" height="63.5"/>
+                                                    <rect key="frame" x="8" y="12" width="359" height="39.5"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q1c-Na-0QG">
-                                                            <rect key="frame" x="0.0" y="0.0" width="113" height="63.5"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="113" height="39.5"/>
                                                             <state key="normal" title="Start"/>
                                                             <connections>
                                                                 <action selector="didTapStart:" destination="JEU-Lg-cln" eventType="touchUpInside" id="Lsh-AG-czd"/>
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iYa-zh-zs3">
-                                                            <rect key="frame" x="113" y="0.0" width="139.5" height="63.5"/>
+                                                            <rect key="frame" x="113" y="0.0" width="139.5" height="39.5"/>
                                                             <state key="normal" title="Pause"/>
                                                             <connections>
                                                                 <action selector="didTapPause:" destination="JEU-Lg-cln" eventType="touchUpInside" id="AYI-qe-Gaa"/>
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GDh-DC-l2g">
-                                                            <rect key="frame" x="252.5" y="0.0" width="106.5" height="63.5"/>
+                                                            <rect key="frame" x="252.5" y="0.0" width="106.5" height="39.5"/>
                                                             <state key="normal" title="Stop"/>
                                                             <connections>
                                                                 <action selector="didTapStop:" destination="JEU-Lg-cln" eventType="touchUpInside" id="xHP-2Q-izC"/>
                                                             </connections>
                                                         </button>
                                                     </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="Q1c-Na-0QG" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wPn-4r-Dci" secondAttribute="leading" id="ArW-cc-W9T"/>
+                                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="GDh-DC-l2g" secondAttribute="trailing" id="K5z-gS-viH"/>
+                                                        <constraint firstItem="iYa-zh-zs3" firstAttribute="leading" secondItem="Q1c-Na-0QG" secondAttribute="trailing" id="Pye-8R-9iY"/>
+                                                        <constraint firstItem="GDh-DC-l2g" firstAttribute="leading" secondItem="iYa-zh-zs3" secondAttribute="trailing" id="qwQ-F3-jdJ"/>
+                                                        <constraint firstItem="GDh-DC-l2g" firstAttribute="baseline" secondItem="iYa-zh-zs3" secondAttribute="baseline" id="tMa-Gp-vZ2"/>
+                                                        <constraint firstItem="iYa-zh-zs3" firstAttribute="baseline" secondItem="Q1c-Na-0QG" secondAttribute="baseline" id="xZa-Ho-ph4"/>
+                                                    </constraints>
                                                 </stackView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="wPn-4r-Dci" firstAttribute="top" secondItem="nHN-LW-Ylv" secondAttribute="top" id="614-Xu-qID"/>
+                                                <constraint firstItem="wPn-4r-Dci" firstAttribute="top" secondItem="nHN-LW-Ylv" secondAttribute="top" constant="12" id="614-Xu-qID"/>
                                                 <constraint firstAttribute="trailing" secondItem="wPn-4r-Dci" secondAttribute="trailing" constant="8" id="CaG-Pl-eGf"/>
-                                                <constraint firstAttribute="bottom" secondItem="wPn-4r-Dci" secondAttribute="bottom" id="tuN-mX-RlJ"/>
+                                                <constraint firstAttribute="bottom" secondItem="wPn-4r-Dci" secondAttribute="bottom" constant="12" id="tuN-mX-RlJ"/>
                                                 <constraint firstItem="wPn-4r-Dci" firstAttribute="leading" secondItem="nHN-LW-Ylv" secondAttribute="leading" constant="8" id="v56-Ro-QqW"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -121,10 +129,10 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="No session" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="n2K-Y0-WHp">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="No session" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="n2K-Y0-WHp">
                                                     <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -135,15 +143,15 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Images" id="eTx-pz-RKy">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="CuD-tn-Ecd" style="IBUITableViewCellStyleDefault" id="11M-fb-qSL">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="CuD-tn-Ecd" style="IBUITableViewCellStyleDefault" id="11M-fb-qSL">
                                         <rect key="frame" x="0.0" y="336" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="11M-fb-qSL" id="deK-7h-dv1">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="No scanned images." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="CuD-tn-Ecd">
-                                                    <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                                    <rect key="frame" x="16" y="0.0" width="324" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -151,6 +159,9 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="lUV-Ru-z3y" kind="show" id="6mr-IX-NOy"/>
+                                        </connections>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -174,6 +185,53 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="McR-GZ-UlF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="354" y="76"/>
+        </scene>
+        <!--Images-->
+        <scene sceneID="FhJ-66-sax">
+            <objects>
+                <tableViewController id="lUV-Ru-z3y" customClass="ImagesTableViewController" customModule="TWAIN_Direct_Sample" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="DpC-5c-dMT">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="cell" textLabel="aSw-uh-5O6" style="IBUITableViewCellStyleDefault" id="ubN-pR-rMJ">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ubN-pR-rMJ" id="003-6k-SdF">
+                                    <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aSw-uh-5O6">
+                                            <rect key="frame" x="16" y="0.0" width="324" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="lUV-Ru-z3y" id="sO5-22-NNa"/>
+                            <outlet property="delegate" destination="lUV-Ru-z3y" id="fsY-oR-9Bq"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Images" id="Ams-pQ-0gn">
+                        <barButtonItem key="rightBarButtonItem" title="Delete All" id="SFl-MQ-ZDe">
+                            <connections>
+                                <action selector="didTapDeleteAll:" destination="lUV-Ru-z3y" id="n22-Kl-U5b"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="deleteAllButton" destination="SFl-MQ-ZDe" id="q1z-OC-7QO"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PkV-P2-cu5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="442" y="856"/>
         </scene>
         <!--Task Picker Table View Controller-->
         <scene sceneID="8yb-z2-Dd8">

@@ -20,10 +20,28 @@ class MainTableTableViewController: UITableViewController {
     
     var session: Session?
     var imageReceiver: ImageReceiver?
+    var lastImageNameReceived = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.tableView.estimatedRowHeight = 44
+        
+        NotificationCenter.default.addObserver(forName:.scannedImagesUpdatedNotification, object: nil, queue: OperationQueue.main) { notification in
+            if let data = notification.object as? ImagesUpdatedNotificationData {
+                self.lastImageNameReceived = data.url.lastPathComponent
+                self.updateStatusLabel()
+                self.updateScannedImagesLabel()
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName:.sessionUpdatedNotification, object: nil, queue: OperationQueue.main) { (_) in
+            self.updateStatusLabel()
+        }
+
+        NotificationCenter.default.addObserver(forName:.didFinishCapturingNotification, object: nil, queue: OperationQueue.main) { (_) in
+            log.info("didFinishCapturingNotification")
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -106,12 +124,13 @@ class MainTableTableViewController: UITableViewController {
     }
     
     @IBAction func didTapStop(_ sender: Any) {
-        
     }
 
     func updateLabels() {
         updateScannerInfoLabel()
         updateTaskLabel()
+        updateStatusLabel()
+        updateScannedImagesLabel()
     }
     
     func updateScannerInfoLabel() {
@@ -120,13 +139,16 @@ class MainTableTableViewController: UITableViewController {
             selectedScannerLabel.text = label
         }
         
-        let scannerJSON = UserDefaults.standard.string(forKey: "scanner")
-        if let scannerInfo = try? JSONDecoder().decode(ScannerInfo.self, from: (scannerJSON?.data(using: .utf8))!) {
-            if let scannerName = scannerInfo.friendlyName {
-                label = scannerName
+        if let scannerJSON = UserDefaults.standard.string(forKey: "scanner") {
+            do {
+                let scannerInfo = try JSONDecoder().decode(ScannerInfo.self, from: (scannerJSON.data(using: .utf8))!)
+                if let scannerName = scannerInfo.friendlyName {
+                    label = scannerName
+                }
+            } catch {
+                log.error("Error deserializing scannerInfo: \(String(describing:error))")
             }
         }
-        
     }
     
     func updateTaskLabel() {
@@ -138,5 +160,28 @@ class MainTableTableViewController: UITableViewController {
         if let taskName = UserDefaults.standard.string(forKey: "taskName") {
             label = taskName
         }
+    }
+    
+    func updateScannedImagesLabel() {
+        let docsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last!
+        let files = try? FileManager.default.contentsOfDirectory(atPath: docsURL.path)
+        let count = files?.count ?? 0
+
+        if (count == 1) {
+            scannedImagesLabel.text = "1 scanned image"
+        } else {
+            scannedImagesLabel.text = "\(count) scanned images"
+        }
+    }
+    
+    func updateStatusLabel() {
+        let state = self.session?.sessionState?.rawValue
+        var text = (state ?? "no session")
+        text = text + "\n\(lastImageNameReceived)"
+        self.sessionStatusLabel.text = text
+        
+    }
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
 }

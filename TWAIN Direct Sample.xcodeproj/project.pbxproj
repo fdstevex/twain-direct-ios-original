@@ -11,6 +11,7 @@
 		843963991F798B1300115128 /* TaskPickerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843963981F798B1300115128 /* TaskPickerTableViewController.swift */; };
 		8441CB181F8104AA0049D02E /* TaskDownloaderWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8441CB171F8104AA0049D02E /* TaskDownloaderWebViewController.swift */; };
 		846F7D281F801D49004E6EB2 /* ImageReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F7D271F801D49004E6EB2 /* ImageReceiver.swift */; };
+		846F7D2A1F828D55004E6EB2 /* ImagesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F7D291F828D55004E6EB2 /* ImagesTableViewController.swift */; };
 		8474E2381F7AD31200B497A2 /* ImageBlockQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */; };
 		8474E2561F7D653200B497A2 /* multipart_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2541F7D653200B497A2 /* multipart_parser.c */; };
 		84A1C6C51F74420F0062C442 /* AES256CBC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A1C6C31F7441CF0062C442 /* AES256CBC.swift */; };
@@ -22,7 +23,6 @@
 		84A1C6CB1F74420F0062C442 /* SwiftyBeaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A1C6BE1F7441CF0062C442 /* SwiftyBeaver.swift */; };
 		84A1C6CD1F744E2F0062C442 /* ScannerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A1C6CC1F744E2F0062C442 /* ScannerInfo.swift */; };
 		84B595951F743715009DD9A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B595941F743715009DD9A4 /* AppDelegate.swift */; };
-		84B595971F743715009DD9A4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B595961F743715009DD9A4 /* ViewController.swift */; };
 		84B5959A1F743715009DD9A4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84B595981F743715009DD9A4 /* Main.storyboard */; };
 		84B5959C1F743715009DD9A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84B5959B1F743715009DD9A4 /* Assets.xcassets */; };
 		84B5959F1F743715009DD9A4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84B5959D1F743715009DD9A4 /* LaunchScreen.storyboard */; };
@@ -38,6 +38,7 @@
 		843963981F798B1300115128 /* TaskPickerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPickerTableViewController.swift; sourceTree = "<group>"; };
 		8441CB171F8104AA0049D02E /* TaskDownloaderWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDownloaderWebViewController.swift; sourceTree = "<group>"; };
 		846F7D271F801D49004E6EB2 /* ImageReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageReceiver.swift; sourceTree = "<group>"; };
+		846F7D291F828D55004E6EB2 /* ImagesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesTableViewController.swift; sourceTree = "<group>"; };
 		8474E2371F7AD31200B497A2 /* ImageBlockQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBlockQueue.swift; sourceTree = "<group>"; };
 		8474E2531F7D653100B497A2 /* TWAIN Direct Sample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TWAIN Direct Sample-Bridging-Header.h"; sourceTree = "<group>"; };
 		8474E2541F7D653200B497A2 /* multipart_parser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = multipart_parser.c; sourceTree = "<group>"; };
@@ -52,7 +53,6 @@
 		84A1C6CC1F744E2F0062C442 /* ScannerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerInfo.swift; sourceTree = "<group>"; };
 		84B595911F743715009DD9A4 /* TWAIN Direct Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TWAIN Direct Sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		84B595941F743715009DD9A4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		84B595961F743715009DD9A4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		84B595991F743715009DD9A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		84B5959B1F743715009DD9A4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84B5959E1F743715009DD9A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -130,7 +130,6 @@
 				84A1C6BC1F7441A60062C442 /* ThirdParty */,
 				84B595A61F7437A6009DD9A4 /* TWAIN Direct */,
 				84B595941F743715009DD9A4 /* AppDelegate.swift */,
-				84B595961F743715009DD9A4 /* ViewController.swift */,
 				84B595981F743715009DD9A4 /* Main.storyboard */,
 				84B5959B1F743715009DD9A4 /* Assets.xcassets */,
 				84B5959D1F743715009DD9A4 /* LaunchScreen.storyboard */,
@@ -160,6 +159,7 @@
 				843963981F798B1300115128 /* TaskPickerTableViewController.swift */,
 				846F7D271F801D49004E6EB2 /* ImageReceiver.swift */,
 				8441CB171F8104AA0049D02E /* TaskDownloaderWebViewController.swift */,
+				846F7D291F828D55004E6EB2 /* ImagesTableViewController.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -246,7 +246,6 @@
 				84A1C6CD1F744E2F0062C442 /* ScannerInfo.swift in Sources */,
 				84A1C6C51F74420F0062C442 /* AES256CBC.swift in Sources */,
 				8474E2381F7AD31200B497A2 /* ImageBlockQueue.swift in Sources */,
-				84B595971F743715009DD9A4 /* ViewController.swift in Sources */,
 				84A1C6C91F74420F0062C442 /* FileDestination.swift in Sources */,
 				843963991F798B1300115128 /* TaskPickerTableViewController.swift in Sources */,
 				84C96AA31F75818600F2038D /* MainTableTableViewController.swift in Sources */,
@@ -254,6 +253,7 @@
 				84A1C6C81F74420F0062C442 /* ConsoleDestination.swift in Sources */,
 				84C96AA51F758F7200F2038D /* Session.swift in Sources */,
 				84B595A81F7437C4009DD9A4 /* ServiceDiscoverer.swift in Sources */,
+				846F7D2A1F828D55004E6EB2 /* ImagesTableViewController.swift in Sources */,
 				84A1C6C61F74420F0062C442 /* Base64.swift in Sources */,
 				8474E2561F7D653200B497A2 /* multipart_parser.c in Sources */,
 				84B595951F743715009DD9A4 /* AppDelegate.swift in Sources */,

@@ -28,7 +28,7 @@ enum SessionError : Error {
 protocol SessionDelegate: class {
     func session(_ session: Session, didReceive file: URL, metadata: Data)
     func session(_ session: Session, didChangeState newState:Session.State)
-    func session(_ session: Session, didChangeStatus newStatus:Session.StatusDetected, success: Bool)
+    func session(_ session: Session, didChangeStatus newStatus:Session.StatusDetected?, success: Bool)
     func sessionDidFinishCapturing(_ session: Session)
 }
 
@@ -157,7 +157,7 @@ struct WaitForEventsResponse : Codable {
     
     struct WaitForEventsResults : Codable {
         var success: Bool
-        var events: [SessionEvent]
+        var events: [SessionEvent]?
     }
     
     struct SessionEvent : Codable {
@@ -172,7 +172,11 @@ struct CreateSessionRequest : Codable {
     var method = "createSession"
 }
 
-struct SessionStatus : Codable {
+struct SessionStatus : Codable, Equatable {
+    static func ==(lhs: SessionStatus, rhs: SessionStatus) -> Bool {
+        return lhs.success == rhs.success && lhs.detected == rhs.detected
+    }
+    
     var success: Bool
     var detected: Session.StatusDetected?
 }
@@ -249,6 +253,12 @@ class Session {
     
     var sessionID: String?
     var sessionRevision = 0
+    var sessionStatus: SessionStatus?
+    var sessionState: State?
+    
+    var paused = false
+    var stopping = false
+    
     var shouldWaitForEvents = false
     var infoExResponse: InfoExResponse?
 
@@ -264,6 +274,48 @@ class Session {
         self.scanner = scanner
     }
 
+    func updateSession(_ session: SessionResponse) {
+        let oldState = sessionState
+        let oldStatus: SessionStatus? = session.status
+        
+        sessionRevision = session.revision
+        sessionStatus = session.status
+        sessionState = session.state
+
+        guard let newState = sessionState else {
+            // No state
+            return
+        }
+
+        if (newState != oldState) {
+            delegate?.session(self, didChangeState: newState)
+        }
+        
+        if (oldState != State.closed && newState == .closed && stopping) {
+            // Release all the image blocks
+            releaseImageBlocks(from: 1, to: Int(Int32.max), completion: { (_) in
+                log.info("final releaseImageBlocks completed")
+            })
+        }
+
+        // Close the session if we're done capturing, there are no more blocks, and we're not paused
+        if (session.doneCapturing ?? false && session.imageBlocksDrained ?? false && !self.paused && !stopping) {
+            self.closeSession(completion: { (result) in
+                switch (result) {
+                case .Success:
+                    self.delegate?.sessionDidFinishCapturing(self)
+                case .Failure(let error):
+                    log.error("Error closing session: \(String(describing:error))")
+                    self.delegate?.sessionDidFinishCapturing(self)
+                }
+            })
+        }
+
+        if (sessionStatus != oldStatus) {
+            delegate?.session(self, didChangeStatus: sessionStatus?.detected, success: sessionStatus?.success ?? false)
+        }
+    }
+    
     // Get a Privet token, and open a session with the scanner
     func open(completion: @escaping (AsyncResult)->()) {
         guard let url = URL(string: "/privet/infoex", relativeTo: scanner.url) else {
@@ -335,6 +387,7 @@ class Session {
                     completion(AsyncResult.Failure(error))
                     return
                 }
+                
                 self.sessionID = createSessionResponse.results.session?.sessionId
                 self.sessionRevision = 0
                 if (self.sessionID == nil) {
@@ -406,12 +459,14 @@ class Session {
                         return
                     }
                     
-                    response.results.events.forEach { event in
+                    response.results.events?.forEach { event in
                         if (event.session.revision < self.sessionRevision) {
                             // We've already processed this event
                             return
                         }
 
+                        self.updateSession(event.session)
+                        
                         log.info("Received event: \(event)")
 
                         if event.session.doneCapturing ?? false &&
@@ -429,7 +484,7 @@ class Session {
                     // Queue up another wait
                     self.waitForEvents()
                 } catch {
-                    log.error("TODO why \(error)")
+                    log.error("Error deserializing events: \(error)")
                     return
                 }
                 
@@ -445,10 +500,13 @@ class Session {
             completion(.Failure(SessionError.unableToCreateRequest))
             return
         }
-        
+
+        log.info("releaseImageBlocks releasing blocks from \(fromBlock) to \(toBlock)");
+
         let body = ReleaseImageBlocksRequest(sessionId: sessionID, fromBlock:fromBlock, toBlock: toBlock)
         request.httpBody = try? JSONEncoder().encode(body)
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            
             guard let data = data else {
                 // No response data
                 completion(AsyncResult.Failure(error))
@@ -461,6 +519,10 @@ class Session {
                     completion(AsyncResult.Failure(SessionError.releaseImageBlocksFailed(code:releaseImageBlocksResponse.results.code)))
                     return
                 }
+                if let session = releaseImageBlocksResponse.results.session {
+                    self.updateSession(session)
+                }
+
                 completion(AsyncResult.Success)
             } catch {
                 completion(AsyncResult.Failure(error))
@@ -471,6 +533,13 @@ class Session {
     }
 
     func closeSession(completion: @escaping (AsyncResult)->()) {
+        if (stopping) {
+            // Already sent the closeSession
+            return
+        }
+        
+        stopping = true
+        
         guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
             // This shouldn't fail, but just in case
             completion(.Failure(SessionError.unableToCreateRequest))
@@ -492,6 +561,11 @@ class Session {
                     completion(AsyncResult.Failure(SessionError.closeSessionFailed(code:closeSessionResponse.results.code)))
                     return
                 }
+                
+                if let session = closeSessionResponse.results.session {
+                    self.updateSession(session)
+                }
+
                 completion(AsyncResult.Success)
             } catch {
                 completion(AsyncResult.Failure(error))
@@ -552,6 +626,10 @@ class Session {
                 if (!sendTaskResponse.results.success) {
                     completion(AsyncResult.Failure(SessionError.closeSessionFailed(code:sendTaskResponse.results.code)))
                 }
+                
+                if let session = sendTaskResponse.results.session {
+                    self.updateSession(session)
+                }
                 completion(AsyncResult.Success)
             } catch {
                 completion(AsyncResult.Failure(error))
@@ -580,6 +658,10 @@ class Session {
                 let startCapturingResponse = try JSONDecoder().decode(StartCapturingResponse.self, from: data)
                 if (!startCapturingResponse.results.success) {
                     completion(AsyncResponse.Failure(SessionError.startCapturingFailed(response:startCapturingResponse)))
+                }
+                
+                if let session = startCapturingResponse.results.session {
+                    self.updateSession(session);
                 }
                 completion(.Success(startCapturingResponse))
             } catch {

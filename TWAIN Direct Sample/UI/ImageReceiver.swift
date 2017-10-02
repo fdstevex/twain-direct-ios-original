@@ -14,6 +14,11 @@ extension Notification.Name {
     static let didFinishCapturingNotification = Notification.Name("didFinishCapturingNotification")
 }
 
+struct ImagesUpdatedNotificationData {
+    let session: Session
+    let url: URL
+}
+
 /**
  Simple class that accepts images from SessionDelegate and stores them on disk, then
  broadcasts a notification to let the UI know to refresh.
@@ -21,10 +26,11 @@ extension Notification.Name {
 class ImageReceiver : SessionDelegate {
     let docsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last!
     
-    func session(_ session: Session, didReceive file: URL, metadata: Data) {
+    func session(_ session: Session, didReceive url: URL, metadata: Data) {
         log.info("Moving to \(docsDir)")
-        try? FileManager.default.moveItem(at: file, to: docsDir.appendingPathComponent(file.lastPathComponent))
-        NotificationCenter.default.post(name: .scannedImagesUpdatedNotification, object: self)
+        try? FileManager.default.moveItem(at: url, to: docsDir.appendingPathComponent(url.lastPathComponent))
+        let info = ImagesUpdatedNotificationData(session: session, url: url)
+        NotificationCenter.default.post(name: .scannedImagesUpdatedNotification, object: info)
     }
     
     func session(_ session: Session, didChangeState newState: Session.State) {
@@ -32,8 +38,8 @@ class ImageReceiver : SessionDelegate {
         NotificationCenter.default.post(name: .sessionUpdatedNotification, object: self)
     }
     
-    func session(_ session: Session, didChangeStatus newStatus: Session.StatusDetected, success: Bool) {
-        log.info("sessionDidChangeStatus \(newStatus) success=\(success)")
+    func session(_ session: Session, didChangeStatus newStatus: Session.StatusDetected?, success: Bool) {
+        log.info("sessionDidChangeStatus \(String(describing:newStatus)) success=\(success)")
         NotificationCenter.default.post(name: .sessionUpdatedNotification, object: self)
     }
     
