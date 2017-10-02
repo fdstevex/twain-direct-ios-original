@@ -15,6 +15,8 @@ class MainTableTableViewController: UITableViewController {
     @IBOutlet var stopButton: UIButton!
     @IBOutlet weak var selectedScannerLabel: UILabel!
     @IBOutlet weak var selectedTaskLabel: UILabel!
+    @IBOutlet weak var sessionStatusLabel: UILabel!
+    @IBOutlet weak var scannedImagesLabel: UILabel!
     
     var session: Session?
     var imageReceiver: ImageReceiver?
@@ -106,7 +108,6 @@ class MainTableTableViewController: UITableViewController {
     @IBAction func didTapStop(_ sender: Any) {
         
     }
-
 
     func updateLabels() {
         updateScannerInfoLabel()

@@ -17,6 +17,7 @@ enum SessionError : Error {
     case unableToCreateRequest
     case missingAPIInInfoExResponse
     case createSessionFailed(code: String?)
+    case releaseImageBlocksFailed(code: String?)
     case closeSessionFailed(code: String?)
     case missingSessionID
     case invalidJSON
@@ -76,6 +77,30 @@ struct CloseSessionRequest : Codable {
 }
 
 struct CloseSessionResponse : Codable {
+    var kind: String
+    var commandId: String
+    var method: String
+    var results: CommandResult
+}
+
+struct ReleaseImageBlocksRequest : Codable {
+    var kind = "twainlocalscanner"
+    var commandId = UUID().uuidString
+    var method = "releaseImageBlocks"
+    var params: ReleaseImageBlocksParams
+    
+    init(sessionId: String, fromBlock: Int, toBlock: Int) {
+        params = ReleaseImageBlocksParams(sessionId: sessionId, imageBlockNum:fromBlock, lastImageBlockNum:toBlock)
+    }
+    
+    struct ReleaseImageBlocksParams : Codable {
+        var sessionId: String
+        var imageBlockNum: Int
+        var lastImageBlockNum: Int
+    }
+}
+
+struct ReleaseImageBlocksResponse : Codable {
     var kind: String
     var commandId: String
     var method: String
@@ -387,6 +412,8 @@ class Session {
                             return
                         }
 
+                        log.info("Received event: \(event)")
+
                         if event.session.doneCapturing ?? false &&
                             event.session.imageBlocksDrained ?? false {
                             // We're done capturing and all image blocks drained -
@@ -411,7 +438,38 @@ class Session {
             task.resume()
         }
     }
-    
+
+    func releaseImageBlocks(from fromBlock: Int, to toBlock: Int, completion: @escaping (AsyncResult)->()) {
+        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
+            // This shouldn't fail, but just in case
+            completion(.Failure(SessionError.unableToCreateRequest))
+            return
+        }
+        
+        let body = ReleaseImageBlocksRequest(sessionId: sessionID, fromBlock:fromBlock, toBlock: toBlock)
+        request.httpBody = try? JSONEncoder().encode(body)
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data else {
+                // No response data
+                completion(AsyncResult.Failure(error))
+                return
+            }
+            
+            do {
+                let releaseImageBlocksResponse = try JSONDecoder().decode(ReleaseImageBlocksResponse.self, from: data)
+                if (!releaseImageBlocksResponse.results.success) {
+                    completion(AsyncResult.Failure(SessionError.releaseImageBlocksFailed(code:releaseImageBlocksResponse.results.code)))
+                    return
+                }
+                completion(AsyncResult.Success)
+            } catch {
+                completion(AsyncResult.Failure(error))
+            }
+        }
+        
+        task.resume()
+    }
+
     func closeSession(completion: @escaping (AsyncResult)->()) {
         guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
             // This shouldn't fail, but just in case
@@ -432,6 +490,7 @@ class Session {
                 let closeSessionResponse = try JSONDecoder().decode(CloseSessionResponse.self, from: data)
                 if (!closeSessionResponse.results.success) {
                     completion(AsyncResult.Failure(SessionError.closeSessionFailed(code:closeSessionResponse.results.code)))
+                    return
                 }
                 completion(AsyncResult.Success)
             } catch {

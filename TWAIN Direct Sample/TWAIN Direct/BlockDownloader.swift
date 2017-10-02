@@ -336,6 +336,17 @@ class BlockDownloader {
                     // part is all here.
                     self.blockStatus[blockNum] = .waitingForMoreParts
                     
+                    // Release
+                    session.releaseImageBlocks(from: blockNum, to: blockNum, completion: { (result) in
+                        switch (result) {
+                        case .Success:
+                                log.info("Released image block \(blockNum)")
+                                break;
+                        case .Failure(let error):
+                            log.error("Error releasing block \(blockNum): \(String(describing:error))")
+                        }
+                    })
+
                     self.downloadedBlocks[blockNum] = DownloadedBlockInfo(blockNum: blockNum, metadata: response, response: result, pdfPath: tempPDF)
                     
                     self.lock.unlock()

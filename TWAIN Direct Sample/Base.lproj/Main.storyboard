@@ -112,7 +112,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Result" id="M1H-GK-2IY">
+                            <tableViewSection headerTitle="Session" id="M1H-GK-2IY">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="n2K-Y0-WHp" style="IBUITableViewCellStyleDefault" id="tRE-9d-Xd2">
                                         <rect key="frame" x="0.0" y="264" width="375" height="44"/>
@@ -133,6 +133,27 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Images" id="eTx-pz-RKy">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="CuD-tn-Ecd" style="IBUITableViewCellStyleDefault" id="11M-fb-qSL">
+                                        <rect key="frame" x="0.0" y="336" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="11M-fb-qSL" id="deK-7h-dv1">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="No scanned images." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="CuD-tn-Ecd">
+                                                    <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="JEU-Lg-cln" id="nQI-6z-giw"/>
@@ -142,8 +163,10 @@
                     <navigationItem key="navigationItem" title="TWAIN Direct Sample" id="Me7-SB-gfR"/>
                     <connections>
                         <outlet property="pauseButton" destination="iYa-zh-zs3" id="6g5-tu-gCg"/>
+                        <outlet property="scannedImagesLabel" destination="CuD-tn-Ecd" id="VRv-tz-ZYi"/>
                         <outlet property="selectedScannerLabel" destination="Jxu-FN-BTU" id="Tq1-ON-Xcx"/>
                         <outlet property="selectedTaskLabel" destination="P47-qc-fvB" id="Q5F-SR-o4Q"/>
+                        <outlet property="sessionStatusLabel" destination="n2K-Y0-WHp" id="V2y-jA-ttv"/>
                         <outlet property="startButton" destination="Q1c-Na-0QG" id="DsE-4g-uSf"/>
                         <outlet property="stopButton" destination="GDh-DC-l2g" id="s9i-Bk-Zmy"/>
                     </connections>
