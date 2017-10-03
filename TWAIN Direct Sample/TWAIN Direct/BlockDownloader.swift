@@ -54,7 +54,7 @@ struct ReadImageBlockResponse : Codable {
     }
     
     struct ImageMetadata: Codable {
-        var image: ImageInfo
+        var image: ImageInfo?
         var address: ImageAddress
     }
     
@@ -348,13 +348,19 @@ class BlockDownloader {
                     })
 
                     self.downloadedBlocks[blockNum] = DownloadedBlockInfo(blockNum: blockNum, metadata: response, response: result, pdfPath: tempPDF)
-                    
+
+                    self.activeDownloadCount = self.activeDownloadCount - 1
+
                     self.lock.unlock()
-                    
+                   
                     self.deliverCompletedBlocks()
+                    
+                    // Kick off the next one
+                    self.download()
                 } catch {
                     log.error("Error decoding response: \(error)")
                     self.lock.lock()
+                    self.activeDownloadCount = self.activeDownloadCount - 1
                     self.blockStatus[blockNum] = .readyToDownload
                     self.lock.unlock()
                     return
@@ -412,9 +418,40 @@ class BlockDownloader {
         try! fm.moveItem(at:firstMeta.pdfPath, to: destURL)
         
         // Concatenate subsequent parts
-        
-        // TODO
-        
+        if (partsToAssemble > 1) {
+            do {
+                let chunkSize = 128*1024
+                let outfh = try FileHandle(forUpdating: destURL)
+                outfh.seekToEndOfFile()
+                
+                // We will be updating downloadedBlocks as we concatenate
+                lock.lock()
+                defer { lock.unlock() }
+                
+                for block in highestBlockCompleted + 1 ..< nextBlock {
+                    if let blockInfo = downloadedBlocks[block] {
+                        let infh = try FileHandle(forReadingFrom: blockInfo.pdfPath)
+                        var data = infh.readData(ofLength: chunkSize)
+                        while (data.count > 0) {
+                            outfh.write(data)
+                            data = infh.readData(ofLength: chunkSize)
+                        }
+                        infh.closeFile()
+                        try FileManager.default.removeItem(at: blockInfo.pdfPath)
+                    }
+                    downloadedBlocks.removeValue(forKey: block)
+                }
+                outfh.closeFile()
+            } catch {
+                log.error("Error concatenating files: \(error)")
+                if let session = session {
+                    session.delegate?.session(session, didEncounterError: error)
+                }
+                highestBlockCompleted = nextBlock
+                return
+            }
+        }
+       
         // Deliver
         if let session = session {
             session.delegate?.session(session, didReceive: destURL, metadata: firstMeta.metadata)

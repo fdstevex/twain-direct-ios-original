@@ -30,6 +30,7 @@ protocol SessionDelegate: class {
     func session(_ session: Session, didChangeState newState:Session.State)
     func session(_ session: Session, didChangeStatus newStatus:Session.StatusDetected?, success: Bool)
     func sessionDidFinishCapturing(_ session: Session)
+    func session(_ session: Session, didEncounterError error:Error)
 }
 
 enum AsyncResult {
