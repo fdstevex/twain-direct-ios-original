@@ -19,13 +19,22 @@ class ImagesTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        NotificationCenter.default.addObserver(forName:.scannedImagesUpdatedNotification, object: nil, queue: OperationQueue.main) { notification in
+            self.refresh()
+        }
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+ 
+        refresh();
+    }
+
+    func refresh() {
         if let files = try? FileManager.default.contentsOfDirectory(atPath: docsDir.path) {
-            self.files = files
+            self.files = files.sorted().reversed()
+            self.tableView.reloadData()
         }
     }
     
