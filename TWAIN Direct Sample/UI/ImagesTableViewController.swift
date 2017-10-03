@@ -36,9 +36,18 @@ class ImagesTableViewController: UITableViewController {
             self.files = files.sorted().reversed()
             self.tableView.reloadData()
         }
+        
+        deleteAllButton.isEnabled = !files.isEmpty
     }
     
     @IBAction func didTapDeleteAll(_ sender: Any) {
+        if let files = try? FileManager.default.contentsOfDirectory(atPath: docsDir.path) {
+            for file in files {
+                try? FileManager.default.removeItem(at: docsDir.appendingPathComponent(file))
+            }
+        }
+        
+        refresh()
     }
     
     // MARK: - Table view data source
