@@ -56,10 +56,19 @@ class MainTableTableViewController: UITableViewController {
     }
     
     @IBAction func didTapStart(_ sender: Any) {
-        guard let url = URL(string: "http://DESKTOP-48KEF92.local:34034/") else {
+        guard let scannerJSON = UserDefaults.standard.string(forKey: "scanner") else {
             return
         }
-        let scanner = ScannerInfo(url: url, fqdn: "DESKTOP-48KEF92.local", txtDict: [String:String]())
+        
+        var scannerInfo: ScannerInfo!
+        do {
+            scannerInfo = try JSONDecoder().decode(ScannerInfo.self, from: (scannerJSON.data(using: .utf8))!)
+        } catch {
+            log.error("Failed deserializing scannerInfo: \(error)")
+            return
+        }
+        
+        let scanner = ScannerInfo(url: scannerInfo.url, fqdn: scannerInfo.fqdn, txtDict: [String:String]())
         session = Session(scanner: scanner)
         
         imageReceiver = ImageReceiver()
@@ -68,10 +77,10 @@ class MainTableTableViewController: UITableViewController {
         session?.open { result in
             switch (result) {
             case .Success:
-                log.info("Success")
+                log.info("didTapStart openSession success")
                 self.sendTask()
             case .Failure(let error):
-                log.info("Failure: \(String(describing:error))")
+                log.info("didTapStart open session failure: \(String(describing:error))")
             }
         }
     }
