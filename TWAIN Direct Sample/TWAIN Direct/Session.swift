@@ -22,6 +22,7 @@ enum SessionError : Error {
     case missingSessionID
     case invalidJSON
     case startCapturingFailed(response: StartCapturingResponse)
+    case stopCapturingFailed(response: StopCapturingResponse)
     case delegateNotSet
 }
 
@@ -224,6 +225,30 @@ struct StartCapturingResponse : Codable {
     var results: CommandResult
 }
 
+struct StopCapturingRequest : Codable {
+    var kind = "twainlocalscanner"
+    var commandId = UUID().uuidString
+    var method = "stopCapturing"
+    
+    var params: StopCapturingParams
+    
+    init(sessionId: String) {
+        params = StopCapturingParams(sessionId: sessionId)
+    }
+    
+    struct StopCapturingParams : Codable {
+        var sessionId: String
+    }
+    
+}
+
+struct StopCapturingResponse : Codable {
+    var kind: String
+    var commandId: String
+    var method: String
+    var results: CommandResult
+}
+
 struct CreateSessionResponse : Codable {
     var kind: String
     var commandId: String
@@ -261,6 +286,10 @@ class Session {
     var stopping = false
     
     var shouldWaitForEvents = false
+    var waitForEventsRetryCount = 0
+    let numWaitForEventsRetriesAllowed = 3
+    
+    
     var infoExResponse: InfoExResponse?
 
     var longPollSession: URLSession?
@@ -413,7 +442,7 @@ class Session {
     // Start a waitForEvents call. There must be an active session. Will do nothing if
     // there's already a longPollSession.
     private func waitForEvents() {
-        if (!self.shouldWaitForEvents) {
+        if (!self.shouldWaitForEvents || (self.waitForEventsRetryCount >= self.numWaitForEventsRetriesAllowed)) {
             return
         }
         
@@ -443,6 +472,14 @@ class Session {
                     self.lock.unlock();
                 }
 
+                if (error != nil) {
+                    // Failure - retry up to retry count
+                    log.error("Error detected in waitForEvents: \(String(describing:error))")
+                    self.waitForEventsRetryCount = self.waitForEventsRetryCount + 1
+                    self.waitForEvents()
+                    return
+                }
+
                 // Clear the reference to this session so we can start a new one
                 self.longPollSession = nil
 
@@ -456,7 +493,8 @@ class Session {
                     let response = try JSONDecoder().decode(WaitForEventsResponse.self, from: data)
                     if (!response.results.success) {
                         self.shouldWaitForEvents = false
-                        log.error("waitForEvents reported failure")
+                        log.error("waitForEvents reported failure: \(response.results)")
+                        self.waitForEventsRetryCount = self.waitForEventsRetryCount + 1
                         return
                     }
                     
@@ -481,7 +519,10 @@ class Session {
                             self.blockDownloader?.enqueueBlocks(imageBlocks)
                         }
                     }
-                    
+
+                    // Processed succesfully - reset the retry count
+                    self.waitForEventsRetryCount = 0
+
                     // Queue up another wait
                     self.waitForEvents()
                 } catch {
@@ -665,6 +706,39 @@ class Session {
                     self.updateSession(session);
                 }
                 completion(.Success(startCapturingResponse))
+            } catch {
+                completion(.Failure(error))
+            }
+        }
+        task.resume()
+    }
+    
+    func stopCapturing(completion: @escaping (AsyncResponse<StopCapturingResponse>)->()) {
+        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
+            // This shouldn't fail, but just in case
+            completion(.Failure(SessionError.unableToCreateRequest))
+            return
+        }
+        
+        request.httpBody = try? JSONEncoder().encode(StopCapturingRequest(sessionId: sessionID))
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data else {
+                // No response data
+                completion(.Failure(nil))
+                return
+            }
+            
+            do {
+                let stopCapturingResponse = try JSONDecoder().decode(StopCapturingResponse.self, from: data)
+                if (!stopCapturingResponse.results.success) {
+                    completion(AsyncResponse.Failure(SessionError.stopCapturingFailed(response:stopCapturingResponse)))
+                }
+                
+                if let session = stopCapturingResponse.results.session {
+                    self.updateSession(session);
+                }
+                completion(.Success(stopCapturingResponse))
             } catch {
                 completion(.Failure(error))
             }

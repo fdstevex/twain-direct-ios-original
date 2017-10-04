@@ -68,33 +68,38 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Scan" id="koO-dR-0as">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="64" id="YIN-G9-S2D">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" rowHeight="64" id="YIN-G9-S2D">
                                         <rect key="frame" x="0.0" y="172" width="375" height="64"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YIN-G9-S2D" id="nHN-LW-Ylv">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="63.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="wPn-4r-Dci">
+                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="wPn-4r-Dci">
                                                     <rect key="frame" x="8" y="12" width="359" height="39.5"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q1c-Na-0QG">
-                                                            <rect key="frame" x="0.0" y="0.0" width="113" height="39.5"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="99.5" height="39.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                             <state key="normal" title="Start"/>
                                                             <connections>
                                                                 <action selector="didTapStart:" destination="JEU-Lg-cln" eventType="touchUpInside" id="Lsh-AG-czd"/>
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iYa-zh-zs3">
-                                                            <rect key="frame" x="113" y="0.0" width="139.5" height="39.5"/>
+                                                            <rect key="frame" x="107.5" y="0.0" width="123" height="39.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                             <state key="normal" title="Pause"/>
                                                             <connections>
                                                                 <action selector="didTapPause:" destination="JEU-Lg-cln" eventType="touchUpInside" id="AYI-qe-Gaa"/>
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GDh-DC-l2g">
-                                                            <rect key="frame" x="252.5" y="0.0" width="106.5" height="39.5"/>
-                                                            <state key="normal" title="Stop"/>
+                                                            <rect key="frame" x="238.5" y="0.0" width="120.5" height="39.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                            <state key="normal" title="Stop">
+                                                                <color key="titleShadowColor" red="0.79732325819672134" green="0.2187122832234519" blue="0.2629925412618177" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            </state>
                                                             <connections>
                                                                 <action selector="didTapStop:" destination="JEU-Lg-cln" eventType="touchUpInside" id="xHP-2Q-izC"/>
                                                             </connections>
@@ -171,7 +176,13 @@
                             <outlet property="delegate" destination="JEU-Lg-cln" id="HXz-c7-o3g"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="TWAIN Direct Sample" id="Me7-SB-gfR"/>
+                    <navigationItem key="navigationItem" title="TWAIN Direct Sample" id="Me7-SB-gfR">
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="Kaz-HH-OGg">
+                            <connections>
+                                <action selector="didTapAction:" destination="JEU-Lg-cln" id="6UR-IK-fps"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="pauseButton" destination="iYa-zh-zs3" id="6g5-tu-gCg"/>
                         <outlet property="scannedImagesLabel" destination="CuD-tn-Ecd" id="VRv-tz-ZYi"/>

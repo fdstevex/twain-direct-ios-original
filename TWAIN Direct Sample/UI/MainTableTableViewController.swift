@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import WebKit
 
 class MainTableTableViewController: UITableViewController {
 
@@ -26,17 +27,15 @@ class MainTableTableViewController: UITableViewController {
         super.viewDidLoad()
 
         self.tableView.estimatedRowHeight = 44
-        
         NotificationCenter.default.addObserver(forName:.scannedImagesUpdatedNotification, object: nil, queue: OperationQueue.main) { notification in
             if let data = notification.object as? ImagesUpdatedNotificationData {
                 self.lastImageNameReceived = data.url.lastPathComponent
-                self.updateStatusLabel()
                 self.updateScannedImagesLabel()
             }
         }
 
         NotificationCenter.default.addObserver(forName:.sessionUpdatedNotification, object: nil, queue: OperationQueue.main) { (_) in
-            self.updateStatusLabel()
+            self.updateUI()
         }
 
         NotificationCenter.default.addObserver(forName:.didFinishCapturingNotification, object: nil, queue: OperationQueue.main) { (_) in
@@ -47,7 +46,7 @@ class MainTableTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        updateLabels()
+        updateUI()
     }
     
     
@@ -59,6 +58,9 @@ class MainTableTableViewController: UITableViewController {
         guard let scannerJSON = UserDefaults.standard.string(forKey: "scanner") else {
             return
         }
+        
+        // Disable until the next transition to avoid double-taps
+        startButton.isEnabled = false
         
         var scannerInfo: ScannerInfo!
         do {
@@ -82,6 +84,63 @@ class MainTableTableViewController: UITableViewController {
             case .Failure(let error):
                 log.info("didTapStart open session failure: \(String(describing:error))")
             }
+        }
+    }
+    
+    @IBAction func didTapPause(_ sender: Any) {
+        session?.stopCapturing(completion: { (result) in
+            switch (result) {
+            case .Success:
+                log.info("stopCapturing succeeded")
+            case .Failure(let error):
+                log.error("stopCapturing failed, error=\(String(describing:error))")
+                self.resetSession()
+            }
+        })
+    }
+    
+    @IBAction func didTapStop(_ sender: Any) {
+        session?.closeSession(completion: { (result) in
+            switch (result) {
+            case .Success:
+                log.info("closeSession succeeded")
+            case .Failure(let error):
+                log.error("closeSession failed, error=\(String(describing:error))")
+            }
+        })
+    }
+    
+    @IBAction func didTapAction(_ sender: Any) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Show Log", style: .default, handler: { _ in
+            // Show a WebView with the log file
+            let webView = WKWebView()
+            let vc = UIViewController()
+            if let url = (UIApplication.shared.delegate as! AppDelegate).fileDestination.logFileURL {
+                let request = URLRequest(url: url)
+                webView.load(request)
+                vc.view = webView
+         
+                vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.action, target: self, action: #selector(self.didTapShareLog))
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Reset Session", style: .default, handler: { _ in
+            self.session = nil
+            self.updateUI()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        present(alert, animated: true)
+    }
+    
+    @objc func didTapShareLog() {
+        if let url = (UIApplication.shared.delegate as! AppDelegate).fileDestination.logFileURL {
+            let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            present(activityVC, animated:true)
         }
     }
     
@@ -116,25 +175,89 @@ class MainTableTableViewController: UITableViewController {
         })
     }
 
-    // temporary test method
-    func closeSession() {
-        session?.closeSession(completion: { (result) in
-            switch (result) {
-            case .Success:
-                log.info("Session closed")
-            case .Failure(let error):
-                log.error("Close failed, error=\(String(describing:error))")
+    // If there's a session that's not closed, close it.
+    // If there is a session, and it's closed, reset it.
+    func resetSession() {
+        if let session = session {
+            if session.sessionState != .closed && session.sessionState != .noSession {
+                session.closeSession(completion: { (result) in
+                    switch (result) {
+                    case .Success:
+                        log.info("Session closed")
+                    case .Failure(let error):
+                        log.error("Close failed, error=\(String(describing:error))")
+                        self.session = nil
+                    }
+                })
+            } else {
+                self.session = nil
             }
-        })
-    }
-
-    @IBAction func didTapPause(_ sender: Any) {
-        closeSession()
+        }
+        
+        updateUI()
     }
     
-    @IBAction func didTapStop(_ sender: Any) {
+    func updateUI() {
+        OperationQueue.main.addOperation {
+            self.updateLabels()
+            self.updateButtons()
+            self.updateScannedImagesLabel()
+        }
     }
+    
+    func updateButtons() {
+        var enablePlay = false
+        var enablePause = false
+        var enableStop = false
+        
+        if let session = session {
+            let state = session.sessionState ?? .noSession
+            // There is a session .. buttons state depends on session state
+            switch (state) {
+            case .noSession:
+                enablePlay = true
+                break;
+            case .ready:
+                enablePlay = true
+                enableStop = true
+                break;
+            case .capturing:
+                enablePause = true
+                enableStop = true
+                break;
+            case .draining:
+                enableStop = true
+                break;
+            case .closed:
+                // Waiting for close to complete, no buttons enabled
+                break;
+            }
+        } else {
+            // No session .. enable the Play button if there is a scanner and task configured
+            enablePlay = canScan()
+        }
+        
+        startButton.isEnabled = enablePlay
+        pauseButton.isEnabled = enablePause
+        stopButton.isEnabled = enableStop
+    }
+    
+    // We can scan if:
+    // - There is a scanner selected
+    // - There is a task selected
+    // - The scanner is not offline
+    func canScan() -> Bool {
+        guard let _ = UserDefaults.standard.string(forKey: "scanner") else {
+            return false
+        }
+        
+        guard let _ = UserDefaults.standard.value(forKey: "task") else {
+            return false
+        }
 
+        return true
+    }
+    
     func updateLabels() {
         updateScannerInfoLabel()
         updateTaskLabel()
@@ -188,8 +311,8 @@ class MainTableTableViewController: UITableViewController {
         var text = (state ?? "no session")
         text = text + "\n\(lastImageNameReceived)"
         self.sessionStatusLabel.text = text
-        
     }
+    
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }

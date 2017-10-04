@@ -14,10 +14,14 @@ let log = SwiftyBeaver.self
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    
+    // SwiftyBeaver Log file destination, so we can find it from the log view
+    var fileDestination = FileDestination()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+
         setupLogging()
+        log.info("App started")
         
         return true
     }
@@ -27,6 +31,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         console.format = "$DHH:mm:ss$d $L $M"
         console.asynchronously = false
         log.addDestination(console)
+
+        // Log to a file so we can view the log in the app
+        let _ = fileDestination.deleteLogFile()
+        fileDestination.format = "$DHH:mm:ss$d $L $M"
+        log.addDestination(fileDestination)
     }
 }
 
