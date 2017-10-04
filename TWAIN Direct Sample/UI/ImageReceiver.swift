@@ -51,4 +51,8 @@ class ImageReceiver : SessionDelegate {
             // Sent session close
         }
     }
+    
+    func session(_ session: Session, didEncounterError error: Error) {
+        log.error("ImageReceiver didEncounterError \(error)")
+    }
 }
