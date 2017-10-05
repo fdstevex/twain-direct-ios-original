@@ -76,7 +76,7 @@ class ServiceDiscoverer : NSObject {
             return nil
         }
         
-        let scannerInfo = ScannerInfo(url: url, fqdn: fqdn, txtDict: txtDict)
+        let scannerInfo = ScannerInfo(url: url, name: service.name, fqdn: fqdn, txtDict: txtDict)
         return scannerInfo
     }
 }
@@ -90,11 +90,8 @@ extension ServiceDiscoverer : NetServiceBrowserDelegate {
     }
     
     public func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
-        if let scannerInfo = scannerInfoFrom(service:service) {
-            let key = "\(scannerInfo.url.absoluteString)\(String(describing:scannerInfo.friendlyName))"
-            discoveredScanners.removeValue(forKey: key)
-            delegate?.discoverer(self, didDiscover: Array(discoveredScanners.values))
-        }
+        discoveredScanners = discoveredScanners.filter { $0.value.name != service.name }
+        delegate?.discoverer(self, didDiscover: Array(discoveredScanners.values))
     }
     
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {

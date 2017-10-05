@@ -10,6 +10,7 @@ import Foundation
 
 struct ScannerInfo : Codable {
     let url: URL
+    let name: String
     let fqdn: String
     let txtDict: Dictionary<String, String>
 

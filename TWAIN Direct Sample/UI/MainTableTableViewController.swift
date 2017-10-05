@@ -22,11 +22,19 @@ class MainTableTableViewController: UITableViewController {
     var session: Session?
     var imageReceiver: ImageReceiver?
     var lastImageNameReceived = ""
+
+    // The discovered scanners on the network - used to tag the scanner
+    // as "Offline" if we don't see it.
+    var scannersDiscovered = [ScannerInfo]()
+    
+    var serviceDiscoverer: ServiceDiscoverer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.tableView.estimatedRowHeight = 44
+        self.tableView.rowHeight = UITableViewAutomaticDimension
+        
         NotificationCenter.default.addObserver(forName:.scannedImagesUpdatedNotification, object: nil, queue: OperationQueue.main) { notification in
             if let data = notification.object as? ImagesUpdatedNotificationData {
                 self.lastImageNameReceived = data.url.lastPathComponent
@@ -46,12 +54,18 @@ class MainTableTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        serviceDiscoverer = ServiceDiscoverer(delegate: self)
+        serviceDiscoverer?.start()
+        
         updateUI()
     }
     
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        serviceDiscoverer?.stop()
+        serviceDiscoverer = nil
     }
     
     @IBAction func didTapStart(_ sender: Any) {
@@ -70,7 +84,7 @@ class MainTableTableViewController: UITableViewController {
             return
         }
         
-        let scanner = ScannerInfo(url: scannerInfo.url, fqdn: scannerInfo.fqdn, txtDict: [String:String]())
+        let scanner = ScannerInfo(url: scannerInfo.url, name: scannerInfo.name, fqdn: scannerInfo.fqdn, txtDict: [String:String]())
         session = Session(scanner: scanner)
         
         imageReceiver = ImageReceiver()
@@ -247,7 +261,20 @@ class MainTableTableViewController: UITableViewController {
     // - There is a task selected
     // - The scanner is not offline
     func canScan() -> Bool {
-        guard let _ = UserDefaults.standard.string(forKey: "scanner") else {
+        guard let scannerJSON = UserDefaults.standard.string(forKey: "scanner") else {
+            return false
+        }
+        
+        do {
+            let scannerInfo = try JSONDecoder().decode(ScannerInfo.self, from:scannerJSON.data(using: .utf8)!)
+            
+            if (!scannersDiscovered.contains { $0.friendlyName == scannerInfo.friendlyName }) {
+                // Scanner is not in the mDNS discovery list
+                return false
+            }
+
+        } catch {
+            log.error("Error deserializing selected scanner JSON")
             return false
         }
         
@@ -276,6 +303,10 @@ class MainTableTableViewController: UITableViewController {
                 let scannerInfo = try JSONDecoder().decode(ScannerInfo.self, from: (scannerJSON.data(using: .utf8))!)
                 if let scannerName = scannerInfo.friendlyName {
                     label = scannerName
+                    
+                    if (!scannersDiscovered.contains { $0.friendlyName == scannerName }) {
+                        label = label + " (Offline)"
+                    }
                 }
             } catch {
                 log.error("Error deserializing scannerInfo: \(String(describing:error))")
@@ -312,8 +343,13 @@ class MainTableTableViewController: UITableViewController {
         text = text + "\n\(lastImageNameReceived)"
         self.sessionStatusLabel.text = text
     }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableViewAutomaticDimension
+}
+
+extension MainTableTableViewController : ServiceDiscovererDelegate {
+    func discoverer(_ discoverer: ServiceDiscoverer, didDiscover scanners: [ScannerInfo]) {
+        OperationQueue.main.addOperation {
+            self.scannersDiscovered = scanners
+            self.updateUI()
+        }
     }
 }
