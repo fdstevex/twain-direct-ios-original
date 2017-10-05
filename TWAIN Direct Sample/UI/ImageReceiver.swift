@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension Notification.Name {
     static let scannedImagesUpdatedNotification = Notification.Name("scannedImagesUpdatedNotification")
@@ -50,5 +51,18 @@ class ImageReceiver : SessionDelegate {
     
     func session(_ session: Session, didEncounterError error: Error) {
         log.error("ImageReceiver didEncounterError \(error)")
+        let title = NSLocalizedString("Error", comment: "")
+        let message = error.localizedDescription
+        
+        OperationQueue.main.addOperation {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment:"OK Button"), style: .cancel))
+            alert.modalPresentationStyle = .fullScreen
+            
+            // This should really be passed through to a proper view to present, but for this sample
+            // we'll show an alert on the root window's rootViewController
+            UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: nil)
+        }
     }
 }

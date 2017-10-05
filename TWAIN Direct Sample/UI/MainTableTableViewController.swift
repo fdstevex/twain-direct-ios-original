@@ -68,6 +68,19 @@ class MainTableTableViewController: UITableViewController {
         serviceDiscoverer = nil
     }
     
+    func reportError(_ error: Error?) {
+        log.error("MainTableViewController reporting error  \(String(describing:error))")
+        
+        let title = NSLocalizedString("Error", comment: "")
+        let message = "Error encountered, details not available yet (check the log)."
+        
+        OperationQueue.main.addOperation {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment:"OK Button"), style: .cancel))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     @IBAction func didTapStart(_ sender: Any) {
         guard let scannerJSON = UserDefaults.standard.string(forKey: "scanner") else {
             return
@@ -96,7 +109,7 @@ class MainTableTableViewController: UITableViewController {
                 log.info("didTapStart openSession success")
                 self.sendTask()
             case .Failure(let error):
-                log.info("didTapStart open session failure: \(String(describing:error))")
+                self.reportError(error)
             }
         }
     }
@@ -124,8 +137,10 @@ class MainTableTableViewController: UITableViewController {
         })
     }
     
-    @IBAction func didTapAction(_ sender: Any) {
+    @IBAction func didTapAction(_ sender: UIBarButtonItem) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.popoverPresentationController?.barButtonItem = sender
         
         alert.addAction(UIAlertAction(title: "Show Log", style: .default, handler: { _ in
             // Show a WebView with the log file
