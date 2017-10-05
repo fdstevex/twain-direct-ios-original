@@ -340,6 +340,19 @@ class Session {
                 }
             })
         }
+        
+        // Ensure any image blocks in the session have been enqueued
+        if let imageBlocks = session.imageBlocks {
+            if imageBlocks.count > 0 {
+                lock.lock()
+                if (self.blockDownloader == nil) {
+                    self.blockDownloader = BlockDownloader(session: self)
+                }
+                lock.unlock()
+                
+                self.blockDownloader?.enqueueBlocks(imageBlocks)
+            }
+        }
 
         if (sessionStatus != oldStatus) {
             delegate?.session(self, didChangeStatus: sessionStatus?.detected, success: sessionStatus?.success ?? false)
@@ -513,10 +526,6 @@ class Session {
                             // We're done capturing and all image blocks drained -
                             // No need to keep polling
                             self.shouldWaitForEvents = false
-                        }
-                        
-                        if let imageBlocks = event.session.imageBlocks {
-                            self.blockDownloader?.enqueueBlocks(imageBlocks)
                         }
                     }
 
