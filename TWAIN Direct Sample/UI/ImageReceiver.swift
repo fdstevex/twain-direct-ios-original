@@ -46,10 +46,6 @@ class ImageReceiver : SessionDelegate {
     func sessionDidFinishCapturing(_ session: Session) {
         log.info("sessionDidFinishCapturing")
         NotificationCenter.default.post(name: .didFinishCapturingNotification, object: self)
-        
-        session.closeSession { (result) in
-            // Sent session close
-        }
     }
     
     func session(_ session: Session, didEncounterError error: Error) {
