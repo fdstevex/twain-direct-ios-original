@@ -37,5 +37,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         fileDestination.format = "$DHH:mm:ss$d $L $M"
         log.addDestination(fileDestination)
     }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+
+        if url.pathExtension == "tdt" {
+            log.info("Received task file: \(url.lastPathComponent)")
+            if url.startAccessingSecurityScopedResource() {
+                defer { url.stopAccessingSecurityScopedResource() }
+                
+                if let data = try? Data(contentsOf: url) {
+                    UserDefaults.standard.setValue(data, forKey: "task")
+                    UserDefaults.standard.setValue(url.lastPathComponent, forKey: "taskName")
+                }
+
+                // Post a notification that will trigger the main UI to update the task name
+                NotificationCenter.default.post(name: .sessionUpdatedNotification, object: nil)
+            }
+        }
+        
+        return true
+    }
 }
 
