@@ -147,10 +147,13 @@ class BlockDownloader {
         for block in blocks {
             if (blockStatus[block] == nil) {
                 blockStatus[block] = .readyToDownload
+                log.info("Enqueueing download of block \(block)")
             }
         }
         
-        download()
+        for _ in 0..<windowSize {
+            download()
+        }
     }
     
     // This function starts a download if:
@@ -379,6 +382,7 @@ class BlockDownloader {
     // a file to the app. Assemble, if required, deliver, and delete the parts.
     func deliverCompletedBlocks() {
         lock.lock()
+        defer { lock.unlock() }
         
         // First part,
         var partsToAssemble = 0
@@ -386,7 +390,6 @@ class BlockDownloader {
         for blockNum in highestBlockCompleted... {
             guard let downloadedBlockInfo = downloadedBlocks[blockNum] else {
                 // Missing piece, not ready to deliver
-                lock.unlock()
                 return
             }
             
@@ -403,7 +406,6 @@ class BlockDownloader {
 
         // Use the metadata from the first part to build the filename
         guard let firstMeta = downloadedBlocks[highestBlockCompleted] else {
-            lock.unlock()
             return
         }
 
