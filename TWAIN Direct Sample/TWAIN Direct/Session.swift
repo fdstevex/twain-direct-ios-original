@@ -42,194 +42,6 @@ enum AsyncResponse<T> {
     case Failure(Error?)
 }
 
-struct InfoExResponse : Decodable {
-    enum CodingKeys: String, CodingKey {
-        case type
-        case version
-        case description
-        case api
-        case manufacturer
-        case model
-        case privetToken = "x-privet-token"
-    }
-    var type: String
-    var version: String?
-    var description: String?
-    var api: [String]?
-    var manufacturer: String?
-    var model: String?
-    var privetToken: String
-}
-
-struct CloseSessionRequest : Codable {
-    var kind = "twainlocalscanner"
-    var commandId = UUID().uuidString
-    var method = "closeSession"
-    var params: CloseSessionParams
-    
-    init(sessionId: String) {
-        params = CloseSessionParams(sessionId: sessionId)
-    }
-    
-    struct CloseSessionParams : Codable {
-        var sessionId: String
-    }
-}
-
-struct CloseSessionResponse : Codable {
-    var kind: String
-    var commandId: String
-    var method: String
-    var results: CommandResult
-}
-
-struct ReleaseImageBlocksRequest : Codable {
-    var kind = "twainlocalscanner"
-    var commandId = UUID().uuidString
-    var method = "releaseImageBlocks"
-    var params: ReleaseImageBlocksParams
-    
-    init(sessionId: String, fromBlock: Int, toBlock: Int) {
-        params = ReleaseImageBlocksParams(sessionId: sessionId, imageBlockNum:fromBlock, lastImageBlockNum:toBlock)
-    }
-    
-    struct ReleaseImageBlocksParams : Codable {
-        var sessionId: String
-        var imageBlockNum: Int
-        var lastImageBlockNum: Int
-    }
-}
-
-struct ReleaseImageBlocksResponse : Codable {
-    var kind: String
-    var commandId: String
-    var method: String
-    var results: CommandResult
-}
-
-struct SendTaskRequest : Encodable {
-    var kind = "twainlocalscanner"
-    var commandId = UUID().uuidString
-    var method = "sendTask"
-    var params: SendTaskParams
-    
-    init(sessionId: String, task: [String:Any]) {
-        params = SendTaskParams(sessionId: sessionId)
-    }
-    
-    struct SendTaskParams : Encodable {
-        var sessionId: String
-        
-        enum SendTaskParamsKeys: String, CodingKey {
-            case sessionId
-        }
-    }
-}
-
-struct SendTaskResponse : Codable {
-    var kind: String
-    var commandId: String
-    var method: String
-    var results: CommandResult
-}
-
-struct WaitForEventsRequest : Encodable {
-    var kind = "twainlocalscanner"
-    var commandId = UUID().uuidString
-    var method = "waitForEvents"
-    var params: WaitForEventsParams
-    
-    init(sessionId: String, sessionRevision: Int) {
-        params = WaitForEventsParams(sessionId: sessionId, sessionRevision: sessionRevision)
-    }
-    
-    struct WaitForEventsParams : Encodable {
-        var sessionId: String
-        var sessionRevision: Int
-    }
-}
-
-struct WaitForEventsResponse : Codable {
-    var commandId: String
-    var kind: String
-    var method: String
-    var results: WaitForEventsResults
-    
-    struct WaitForEventsResults : Codable {
-        var success: Bool
-        var events: [SessionEvent]?
-    }
-    
-    struct SessionEvent : Codable {
-        var event: String
-        var session: SessionResponse
-    }
-}
-
-struct CreateSessionRequest : Codable {
-    var kind = "twainlocalscanner"
-    var commandId = UUID().uuidString
-    var method = "createSession"
-}
-
-struct SessionStatus : Codable, Equatable {
-    static func ==(lhs: SessionStatus, rhs: SessionStatus) -> Bool {
-        return lhs.success == rhs.success && lhs.detected == rhs.detected
-    }
-    
-    var success: Bool
-    var detected: Session.StatusDetected?
-}
-
-struct SessionResponse: Codable {
-    var sessionId: String
-    var revision: Int
-
-    var doneCapturing: Bool?
-    var imageBlocks: [Int]?
-    var imageBlocksDrained: Bool?
-
-    var state: Session.State
-    var status: SessionStatus
-}
-
-struct CommandResult: Codable {
-    var success: Bool
-    var session: SessionResponse?
-    var code: String?
-}
-
-struct StartCapturingRequest : Codable {
-    var kind = "twainlocalscanner"
-    var commandId = UUID().uuidString
-    var method = "startCapturing"
-    
-    var params: StartCapturingParams
-    
-    init(sessionId: String) {
-        params = StartCapturingParams(sessionId: sessionId)
-    }
-    
-    struct StartCapturingParams : Codable {
-        var sessionId: String
-    }
-
-}
-
-struct StartCapturingResponse : Codable {
-    var kind: String
-    var commandId: String
-    var method: String
-    var results: CommandResult
-}
-
-struct CreateSessionResponse : Codable {
-    var kind: String
-    var commandId: String
-    var method: String
-    var results: CommandResult
-}
-
 class Session {
     public enum State: String, Codable {
         case noSession
@@ -282,18 +94,16 @@ class Session {
         sessionStatus = session.status
         sessionState = session.state
 
-        guard let newState = sessionState else {
-            // No state
-            return
-        }
-
-        if (newState != oldState) {
-            delegate?.session(self, didChangeState: newState)
+        if (session.state != oldState) {
+            delegate?.session(self, didChangeState: session.state)
         }
         
-        if (oldState != State.closed && newState == .closed && stopping) {
+        // If the session just transitioned to closed, and we're stopping, make sure we
+        // release all the scanned images we don't want to transfer.
+        if (oldState != State.closed && sessionState == .closed && stopping) {
             // Release all the image blocks
             releaseImageBlocks(from: 1, to: Int(Int32.max), completion: { (_) in
+                // This should transition to noSession, we shouldn't need to do anything here
                 log.info("final releaseImageBlocks completed")
             })
         }
@@ -305,6 +115,7 @@ class Session {
                 case .Success:
                     self.delegate?.sessionDidFinishCapturing(self)
                 case .Failure(let error):
+                    // Error closing .. consider the session complete
                     log.error("Error closing session: \(String(describing:error))")
                     self.delegate?.sessionDidFinishCapturing(self)
                 }
@@ -312,6 +123,7 @@ class Session {
         }
 
         if (sessionStatus != oldStatus) {
+            // Notify our delegate that the session changed status
             delegate?.session(self, didChangeStatus: sessionStatus?.detected, success: sessionStatus?.success ?? false)
         }
     }
@@ -332,7 +144,7 @@ class Session {
 
             do {
                 let infoExResponse = try JSONDecoder().decode(InfoExResponse.self, from: data)
-                log.info("\(infoExResponse)")
+                log.info("infoex response: \(infoExResponse)")
                 self.infoExResponse = infoExResponse
                 self.createSession(completion: completion)
             } catch {
@@ -432,11 +244,10 @@ class Session {
                 return
             }
 
-                let body = WaitForEventsRequest(sessionId: sessionID, sessionRevision: sessionRevision)
-                urlRequest.httpBody = try? JSONEncoder().encode(body)
+            let body = WaitForEventsRequest(sessionId: sessionID, sessionRevision: sessionRevision)
+            urlRequest.httpBody = try? JSONEncoder().encode(body)
             
             let task = URLSession.shared.dataTask(with: urlRequest) { (data, response, error) in
-
                 self.lock.lock();
                 defer {
                     self.lock.unlock();
