@@ -199,3 +199,25 @@ struct StartCapturingResponse : Codable {
     var results: CommandResult
 }
 
+struct StopCapturingRequest : Codable {
+    var kind = "twainlocalscanner"
+    var commandId = UUID().uuidString
+    var method = "stopCapturing"
+    
+    var params: StopCapturingParams
+    
+    init(sessionId: String) {
+        params = StopCapturingParams(sessionId: sessionId)
+    }
+    
+    struct StopCapturingParams : Codable {
+        var sessionId: String
+    }
+}
+
+struct StopCapturingResponse : Codable {
+    var kind: String
+    var commandId: String
+    var method: String
+    var results: CommandResult
+}

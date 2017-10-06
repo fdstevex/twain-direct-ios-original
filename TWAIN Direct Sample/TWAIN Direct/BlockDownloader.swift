@@ -8,6 +8,15 @@
 
 import Foundation
 
+enum BlockDownloaderError : Error {
+    case noResponseBody
+    case unexpectedMimeType
+    case missingMimeBoundary
+    case downloadFailed
+    case releaseImageBlocksFailed
+    case missingMetadata
+}
+
 enum BlockStatus: String, Codable {
     // Ready to download
     case readyToDownload
@@ -156,8 +165,9 @@ class BlockDownloader {
         }
     }
     
-    // This function starts a download if:
-    // - we're not already downloading
+    // This function starts a download if we're not already at the configured maximum number
+    // of concurrent downloads. It takes the next block that's in the readyToDownload state,
+    // and starts downloading it.
     func download() {
         lock.lock()
         defer { lock.unlock() }
@@ -188,8 +198,18 @@ class BlockDownloader {
             return
         }
         
-        guard var request = session.createURLRequest(method: "POST") else {
+        var request: URLRequest
+        do {
+            request = try session.createURLRequest(method: "POST")
+        } catch {
             return
+        }
+        
+        func downloadError(_ error: Error) {
+            lock.lock()
+            blockStatus[blockNum] = .readyToDownload
+            lock.unlock()
+            session.delegate?.session(session, didEncounterError: error)
         }
         
         log.info("Starting download of block \(blockNum)")
@@ -197,22 +217,22 @@ class BlockDownloader {
         request.httpBody = try? JSONEncoder().encode(body)
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data, let urlResponse = response as? HTTPURLResponse else {
-                // TODO error
+                downloadError(BlockDownloaderError.noResponseBody)
                 return
             }
             
             if urlResponse.mimeType != "multipart/mixed" {
-                // TODO error
+                downloadError(BlockDownloaderError.unexpectedMimeType)
                 return
             }
             
             guard let contentTypeHeader = urlResponse.allHeaderFields["Content-Type"] as? String else {
-                // TODO error - no boundary
+                downloadError(BlockDownloaderError.missingMimeBoundary)
                 return;
             }
             
             guard let range = contentTypeHeader.range(of: "boundary=") else {
-                // TODO error - no boundary
+                downloadError(BlockDownloaderError.missingMimeBoundary)
                 return;
             }
 
@@ -324,9 +344,7 @@ class BlockDownloader {
 
                     if (!result.results.success) {
                         log.error("Failure downloading block: \(result)")
-                        self.lock.lock()
-                        self.blockStatus[blockNum] = .readyToDownload
-                        self.lock.unlock()
+                        downloadError(BlockDownloaderError.downloadFailed)
                         return
                     }
                     
@@ -343,10 +361,15 @@ class BlockDownloader {
                     session.releaseImageBlocks(from: blockNum, to: blockNum, completion: { (result) in
                         switch (result) {
                         case .Success:
-                                log.info("Released image block \(blockNum)")
-                                break;
+                            log.info("Released image block \(blockNum)")
+                            break;
                         case .Failure(let error):
                             log.error("Error releasing block \(blockNum): \(String(describing:error))")
+                            if let error = error {
+                                downloadError(error);
+                            } else {
+                                downloadError(BlockDownloaderError.releaseImageBlocksFailed);
+                            }
                         }
                     })
 
@@ -406,6 +429,7 @@ class BlockDownloader {
 
         // Use the metadata from the first part to build the filename
         guard let firstMeta = downloadedBlocks[highestBlockCompleted] else {
+            session?.delegate?.session(session!, didEncounterError: BlockDownloaderError.missingMetadata)
             return
         }
 

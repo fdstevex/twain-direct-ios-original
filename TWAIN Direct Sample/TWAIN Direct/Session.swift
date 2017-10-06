@@ -24,6 +24,9 @@ enum SessionError : Error {
     case startCapturingFailed(response: StartCapturingResponse)
     case stopCapturingFailed(response: StopCapturingResponse)
     case delegateNotSet
+    case invalidState
+    case unexpectedError(detail: String)
+    case invalidResponse(detail: String)
 }
 
 protocol SessionDelegate: class {
@@ -173,17 +176,17 @@ class Session {
         task.resume()
     }
 
-    func createURLRequest(method: String) -> URLRequest? {
+    func createURLRequest(method: String) throws -> URLRequest {
         guard let infoExResponse = infoExResponse else {
-            return nil
+            throw SessionError.invalidState
         }
         
         guard let api = infoExResponse.api?.first else {
-            return nil
+            throw SessionError.invalidResponse(detail:"infoex response missing api")
         }
         
         guard let url = URL(string: api, relativeTo: scanner.url) else {
-            return nil
+            throw SessionError.unexpectedError(detail:"error appending \(api) to \(scanner.url)")
         }
         
         var request = URLRequest(url:url)
@@ -196,9 +199,11 @@ class Session {
     
     // Create the session. If successful, starts the event listener.
     func createSession(completion: @escaping (AsyncResult)->()) {
-        guard var request = createURLRequest(method: "POST") else {
-            // This shouldn't fail, but just in case
-            completion(.Failure(SessionError.unableToCreateRequest))
+        var request:URLRequest
+        do {
+            request = try createURLRequest(method: "POST")
+        } catch {
+            completion(.Failure(error))
             return
         }
         
@@ -253,8 +258,11 @@ class Session {
         }
         
         if (self.longPollSession == nil) {
-            guard var urlRequest = createURLRequest(method: "POST") else {
-                log.error("Unexpected: Can't poll because createURLRequest failed")
+            var urlRequest:URLRequest
+            do {
+                urlRequest = try createURLRequest(method: "POST")
+            } catch {
+                delegate?.session(self, didEncounterError: error)
                 return
             }
 
@@ -333,9 +341,17 @@ class Session {
     }
 
     func releaseImageBlocks(from fromBlock: Int, to toBlock: Int, completion: @escaping (AsyncResult)->()) {
-        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
+        var request:URLRequest
+        do {
+            request = try createURLRequest(method: "POST")
+        } catch {
+            delegate?.session(self, didEncounterError: error)
+            return
+        }
+
+        guard let sessionID = sessionID else {
             // This shouldn't fail, but just in case
-            completion(.Failure(SessionError.unableToCreateRequest))
+            completion(.Failure(SessionError.missingSessionID))
             return
         }
 
@@ -378,9 +394,16 @@ class Session {
         
         stopping = true
         
-        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
-            // This shouldn't fail, but just in case
-            completion(.Failure(SessionError.unableToCreateRequest))
+        var request:URLRequest
+        do {
+            request = try createURLRequest(method: "POST")
+        } catch {
+            completion(.Failure(error))
+            return
+        }
+
+        guard let sessionID = sessionID else {
+            completion(.Failure(SessionError.missingSessionID))
             return
         }
 
@@ -419,16 +442,21 @@ class Session {
     // Instead, we prepare the request without the task JSON, use JSONEncoder to encode
     // that into JSON, and then decode that into a dictionary with JSONSerialization.
     // Then we can update that dictionary to include the task, and re-encode to JSON.
-    //
-    // Are there easier ways? Yes. Yes, there are.
     
     func sendTask(_ task: [String:Any], completion: @escaping (AsyncResult)->()) {
-        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
-            // This shouldn't fail, but just in case
-            completion(.Failure(SessionError.unableToCreateRequest))
+        var request:URLRequest
+        do {
+            request = try createURLRequest(method: "POST")
+        } catch {
+            completion(.Failure(error))
             return
         }
         
+        guard let sessionID = sessionID else {
+            completion(AsyncResult.Failure(SessionError.missingSessionID))
+            return
+        }
+
         // Get JSON for the basic request
         let body = SendTaskRequest(sessionId: sessionID, task: task)
         guard let jsonEncodedBody = try? JSONEncoder().encode(body) else {
@@ -455,7 +483,7 @@ class Session {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data else {
                 // No response data
-                completion(AsyncResult.Failure(nil))
+                completion(AsyncResult.Failure(SessionError.invalidResponse(detail: "No response data")))
                 return
             }
             
@@ -477,9 +505,16 @@ class Session {
     }
     
     func startCapturing(completion: @escaping (AsyncResponse<StartCapturingResponse>)->()) {
-        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
-            // This shouldn't fail, but just in case
-            completion(.Failure(SessionError.unableToCreateRequest))
+        var request:URLRequest
+        do {
+            request = try createURLRequest(method: "POST")
+        } catch {
+            completion(.Failure(error))
+            return
+        }
+        
+        guard let sessionID = sessionID else {
+            completion(.Failure(SessionError.missingSessionID))
             return
         }
         
@@ -510,9 +545,16 @@ class Session {
     }
     
     func stopCapturing(completion: @escaping (AsyncResponse<StopCapturingResponse>)->()) {
-        guard var request = createURLRequest(method: "POST"), let sessionID = sessionID else {
-            // This shouldn't fail, but just in case
-            completion(.Failure(SessionError.unableToCreateRequest))
+        var request:URLRequest
+        do {
+            request = try createURLRequest(method: "POST")
+        } catch {
+            completion(.Failure(error))
+            return
+        }
+        
+        guard let sessionID = sessionID else {
+            completion(.Failure(SessionError.missingSessionID))
             return
         }
         
