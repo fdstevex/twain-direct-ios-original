@@ -116,7 +116,7 @@ struct DownloadedBlockInfo {
 class BlockDownloader {
     let lock = NSRecursiveLock()
     
-    // Block numbers <= this value have been downloaded, assembled, and delivered
+    // Block numbers < this value have been downloaded, assembled, and delivered
     // to the application.
     var highestBlockCompleted = 1
 
@@ -193,8 +193,7 @@ class BlockDownloader {
             }
         }
         
-        guard let blockNum = blockToDownload else {
-            // Nothing ready to download
+        guard let blockNum = blockToDownload else {            // Nothing ready to download
             return
         }
         
@@ -477,13 +476,11 @@ class BlockDownloader {
                 return
             }
         }
-       
+      
         // Deliver
         if let session = session {
             session.delegate?.session(session, didReceive: destURL, metadata: firstMeta.metadata)
         }
-        
-        highestBlockCompleted = nextBlock
     }
 }
 
