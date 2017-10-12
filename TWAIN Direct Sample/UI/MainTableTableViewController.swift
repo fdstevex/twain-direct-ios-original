@@ -72,7 +72,7 @@ class MainTableTableViewController: UITableViewController {
         log.error("MainTableViewController reporting error  \(String(describing:error))")
         
         let title = NSLocalizedString("Error", comment: "")
-        let message = "Error encountered, details not available yet (check the log)."
+        var message = error?.localizedDescription ?? "\(String(describing:error))"
         
         OperationQueue.main.addOperation {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -110,6 +110,7 @@ class MainTableTableViewController: UITableViewController {
                 self.sendTask()
             case .Failure(let error):
                 self.reportError(error)
+                self.resetSession()
             }
         }
     }
