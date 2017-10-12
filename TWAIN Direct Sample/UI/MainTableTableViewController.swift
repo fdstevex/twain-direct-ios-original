@@ -354,7 +354,12 @@ class MainTableTableViewController: UITableViewController {
     
     func updateStatusLabel() {
         let state = self.session?.sessionState?.rawValue
+        
         var text = (state ?? "no session")
+        if let statusDetected = self.session?.sessionStatus?.detected {
+            text += "(" + statusDetected.rawValue + ")"
+        }
+
         text = text + "\n\(lastImageNameReceived)"
         self.sessionStatusLabel.text = text
     }
