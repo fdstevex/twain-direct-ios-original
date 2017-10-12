@@ -13,9 +13,6 @@ import Foundation
  */
 
 enum SessionError : Error {
-    case missingInfoExResponse
-    case unableToCreateRequest
-    case missingAPIInInfoExResponse
     case createSessionFailed(code: String?)
     case releaseImageBlocksFailed(code: String?)
     case closeSessionFailed(code: String?)
@@ -27,6 +24,59 @@ enum SessionError : Error {
     case invalidState
     case unexpectedError(detail: String)
     case invalidResponse(detail: String)
+}
+
+// These aren't actually localizable (not returned through NSLocalizedString) because these are states the app
+// should deal with, not report directly to the user.
+extension SessionError: LocalizedError {
+    public var errorDescription: String? {
+        get {
+            switch (self) {
+            case .createSessionFailed(let code):
+                if let code = code {
+                    return "createSession failed (\(code))"
+                } else {
+                    return "createSession failed"
+                }
+            case .releaseImageBlocksFailed(let code):
+                if let code = code {
+                    return "releaseImageBlocks failed (\(code))"
+                } else {
+                    return "releaseImageBlocks failed"
+                }
+            case .closeSessionFailed(let code):
+                if let code = code {
+                    return "closeSession failed (\(code))"
+                } else {
+                    return "closeSession failed"
+                }
+            case .missingSessionID:
+                return "missingSessionID (Session not created or already closed)"
+            case .invalidJSON:
+                return "invalid JSON"
+            case .startCapturingFailed(let response):
+                if let code = response.results.code {
+                    return "startCapturing failed (\(code))"
+                } else {
+                    return "startCapturing failed"
+                }
+            case .stopCapturingFailed(let response):
+                if let code = response.results.code {
+                    return "stopCapturing failed (\(code))"
+                } else {
+                    return "stopCapturing failed"
+                }
+            case .delegateNotSet:
+                return "delegate not set"
+            case .invalidState:
+                return "invalid state"
+            case .unexpectedError(let detail):
+                return "unexpected error \(detail)"
+            case .invalidResponse(let detail):
+                return "invalid response \(detail)"
+            }
+        }
+    }
 }
 
 protocol SessionDelegate: class {
