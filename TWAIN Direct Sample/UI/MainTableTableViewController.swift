@@ -72,7 +72,7 @@ class MainTableTableViewController: UITableViewController {
         log.error("MainTableViewController reporting error  \(String(describing:error))")
         
         let title = NSLocalizedString("Error", comment: "")
-        var message = error?.localizedDescription ?? "\(String(describing:error))"
+        let message = error?.localizedDescription ?? "\(String(describing:error))"
         
         OperationQueue.main.addOperation {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
