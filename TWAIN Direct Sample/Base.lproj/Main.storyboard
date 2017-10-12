@@ -111,14 +111,6 @@
                                                             </connections>
                                                         </button>
                                                     </subviews>
-                                                    <constraints>
-                                                        <constraint firstItem="Q1c-Na-0QG" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wPn-4r-Dci" secondAttribute="leading" id="ArW-cc-W9T"/>
-                                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="GDh-DC-l2g" secondAttribute="trailing" id="K5z-gS-viH"/>
-                                                        <constraint firstItem="iYa-zh-zs3" firstAttribute="leading" secondItem="Q1c-Na-0QG" secondAttribute="trailing" id="Pye-8R-9iY"/>
-                                                        <constraint firstItem="GDh-DC-l2g" firstAttribute="leading" secondItem="iYa-zh-zs3" secondAttribute="trailing" id="qwQ-F3-jdJ"/>
-                                                        <constraint firstItem="GDh-DC-l2g" firstAttribute="baseline" secondItem="iYa-zh-zs3" secondAttribute="baseline" id="tMa-Gp-vZ2"/>
-                                                        <constraint firstItem="iYa-zh-zs3" firstAttribute="baseline" secondItem="Q1c-Na-0QG" secondAttribute="baseline" id="xZa-Ho-ph4"/>
-                                                    </constraints>
                                                 </stackView>
                                             </subviews>
                                             <constraints>
