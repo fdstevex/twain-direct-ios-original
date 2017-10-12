@@ -220,176 +220,71 @@ class BlockDownloader {
                 return
             }
             
-            if urlResponse.mimeType != "multipart/mixed" {
-                downloadError(BlockDownloaderError.unexpectedMimeType)
+            // We have the HTTP response body, containing the MIME multipart/mixed body with
+            // the metadata and the binary payload. Use MultipartExtractor to parse and separate.
+            var json: Data
+            var pdf: Data
+            
+            do {
+                let r = try MultipartExtractor.extract(from: urlResponse, data: data)
+                json = r.json
+                pdf = r.pdf
+            } catch {
+                downloadError(error)
                 return
             }
             
-            guard let contentTypeHeader = urlResponse.allHeaderFields["Content-Type"] as? String else {
-                downloadError(BlockDownloaderError.missingMimeBoundary)
-                return;
-            }
-            
-            guard let range = contentTypeHeader.range(of: "boundary=") else {
-                downloadError(BlockDownloaderError.missingMimeBoundary)
-                return;
-            }
-
-            let quotedBoundary = String(contentTypeHeader[range.upperBound...])
-            let boundary = "--" + (quotedBoundary as NSString).trimmingCharacters(in: CharacterSet(charactersIn:"\"'"))
-            
-            var callbacks = multipart_parser_settings()
-            let parser = multipart_parser_init(boundary, &callbacks)
-            
-            let tempPDF = self.tempFolder.appendingPathComponent(UUID().uuidString).appendingPathExtension("pdf")
-            
-            class Context {
-                var fieldName: String?
-                var headers = [String:String]()
-                var contentType = ""
-                
-                var json: Data?
-                var pdf: Data?
-                var current = Data()
-                
-                func partDataEnd() {
-                    log.info("part data end, \(current.count) bytes");
-                    
-                    // Figure out where the body part should go
-                    if let contentType = headers["content-type"] {
-                        if contentType.starts(with: "application/json") {
-                            json = current
-                        } else if contentType.starts(with: "application/pdf") {
-                            pdf = current
-                        }
-                    }
-                    
-                    current = Data()
-                }
-            }
-            
-            var context = Context()
-            
-            callbacks.on_header_field = { parser, ptr, count in
-                let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self)
-                let data = Data.init(bytes: ptr!, count: count)
-                context?.pointee.fieldName = String(data:data, encoding: .utf8)
-                return 0
-            }
-            
-            callbacks.on_header_value = { parser, ptr, count in
-                if let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self) {
-                    if let fieldName = context.pointee.fieldName {
-                        let data = Data.init(bytes: ptr!, count: count)
-                        if let fieldValue = String(data:data, encoding: .utf8) {
-                            context.pointee.headers[fieldName.lowercased()] = fieldValue
-                            log.info("\(fieldName)=\(fieldValue)")
-                        }
-                    }
-                }
-                return 0
-            }
-            
-            callbacks.on_part_data_begin = { parser in
-                let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self)
-                log.info("part begin");
-                context?.pointee.headers.removeAll()
-                return 0
-            }
-            
-            callbacks.on_headers_complete = { parser in
-                if let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self) {
-                    log.info("headers complete")
-                    context.pointee.current = Data()
-                }
-                
-                return 0
-            }
-            
-            callbacks.on_part_data_end = { parser in
-                if let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self).pointee {
-                    context.partDataEnd()
-                }
-                return 0
-            }
-
-            withUnsafeMutablePointer(to: &context, { (dataPtr) -> Void in
-                multipart_parser_set_data(parser, dataPtr)
-            })
-            
-            callbacks.on_part_data = { parser, ptr, count in
-                let context = multipart_parser_get_data(parser)?.assumingMemoryBound(to: Context.self)
-                ptr?.withMemoryRebound(to: UInt8.self, capacity: count, { (p) -> Void in
-                    context?.pointee.current.append(p, count: count)
-                })
-                return 0
-            }
-
-            let _ = data.withUnsafeBytes {
-                multipart_parser_execute(parser, UnsafePointer($0), data.count)
-            }
-
-            if (context.current.count > 0) {
-                context.partDataEnd()
-            }
-            multipart_parser_free(parser)
-            
-            // Remove the trailing crlf that ends the body part
-            context.pdf?.removeLast(2)
-            
-            if let pdf = context.pdf, let response = context.json {
-                do {
-                    let result = try JSONDecoder().decode(ReadImageBlockResponse.self, from: response)
-
-                    if (!result.results.success) {
-                        log.error("Failure downloading block: \(result)")
-                        downloadError(BlockDownloaderError.downloadFailed)
-                        return
-                    }
-                    
-                    log.info("Writing PDF for block \(blockNum) to \(tempPDF)")
-                    try? pdf.write(to: tempPDF)
-                    
-                    self.lock.lock()
-                    
-                    // There may not be more parts, but this signals to deliverCompletedBlocks that this
-                    // part is all here.
-                    self.blockStatus[blockNum] = .waitingForMoreParts
-                    
-                    // Release
-                    session.releaseImageBlocks(from: blockNum, to: blockNum, completion: { (result) in
-                        switch (result) {
-                        case .Success:
-                            log.info("Released image block \(blockNum)")
-                            break;
-                        case .Failure(let error):
-                            log.error("Error releasing block \(blockNum): \(String(describing:error))")
-                            if let error = error {
-                                downloadError(error);
-                            } else {
-                                downloadError(BlockDownloaderError.releaseImageBlocksFailed);
-                            }
-                        }
-                    })
-
-                    self.downloadedBlocks[blockNum] = DownloadedBlockInfo(blockNum: blockNum, metadata: response, response: result, pdfPath: tempPDF)
-
-                    self.activeDownloadCount = self.activeDownloadCount - 1
-
-                    self.lock.unlock()
-                   
-                    self.deliverCompletedBlocks()
-                    
-                    // Kick off the next one
-                    self.download()
-                } catch {
-                    log.error("Error decoding response: \(error)")
-                    self.lock.lock()
-                    self.activeDownloadCount = self.activeDownloadCount - 1
-                    self.blockStatus[blockNum] = .readyToDownload
-                    self.lock.unlock()
+            do {
+                let result = try JSONDecoder().decode(ReadImageBlockResponse.self, from: json)
+                if (!result.results.success) {
+                    log.error("Failure downloading block: \(result)")
+                    downloadError(BlockDownloaderError.downloadFailed)
                     return
                 }
+                
+                let tempPDF = self.tempFolder.appendingPathComponent(UUID().uuidString).appendingPathExtension("pdf")
+                log.info("Writing PDF for block \(blockNum) to \(tempPDF)")
+                try? pdf.write(to: tempPDF)
+                
+                self.lock.lock()
+                
+                // There may not be more parts, but this signals to deliverCompletedBlocks that this
+                // part is all here.
+                self.blockStatus[blockNum] = .waitingForMoreParts
+                
+                // Release
+                session.releaseImageBlocks(from: blockNum, to: blockNum, completion: { (result) in
+                    switch (result) {
+                    case .Success:
+                        log.info("Released image block \(blockNum)")
+                        break;
+                    case .Failure(let error):
+                        log.error("Error releasing block \(blockNum): \(String(describing:error))")
+                        if let error = error {
+                            downloadError(error);
+                        } else {
+                            downloadError(BlockDownloaderError.releaseImageBlocksFailed);
+                        }
+                    }
+                })
+                
+                self.downloadedBlocks[blockNum] = DownloadedBlockInfo(blockNum: blockNum, metadata: json, response: result, pdfPath: tempPDF)
+                
+                self.activeDownloadCount = self.activeDownloadCount - 1
+                
+                self.lock.unlock()
+                
+                self.deliverCompletedBlocks()
+                
+                // Kick off the next one
+                self.download()
+            } catch {
+                log.error("Error decoding response: \(error)")
+                self.lock.lock()
+                self.activeDownloadCount = self.activeDownloadCount - 1
+                self.blockStatus[blockNum] = .readyToDownload
+                self.lock.unlock()
+                return
             }
         }
 
